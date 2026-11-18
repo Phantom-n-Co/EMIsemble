@@ -1,6 +1,6 @@
 # EMIsemble
 
-Many mods only have JEI support, so their recipes are missing from EMI unless JEI is installed next to it.
+Many mods only have JEI support, so their recipes are missing from EMI unless JEI(or TMRV) is installed next to it.\
 EMIsemble adds native EMI categories for those mods.
 
 ## Supported mods (36)
@@ -16,8 +16,7 @@ Starbunclemania, Thaumaturge, Toxony, Vanilla Backport
 ## Before you install
 
 - **TMRV**: turn these mods off in its config, or their recipes appear twice.
-- **Extra Apoth Compat**: don't install it alongside. Same Apotheosis pages, so the game refuses the pair
-  and explains why.
+- **Extra Apoth Compat**: don't install it alongside. Same Apotheosis pages, marked as incompatible.
 - **Just Enough Spirits**: skip it. Its only page is Malum's spirit drops, which this mod already adds.
 
 ## Config
