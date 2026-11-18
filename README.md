@@ -1,7 +1,5 @@
 # EMIsemble
 
-Adds EMI categories for mods that only have JEI support.
-
 Many mods only have JEI support, so their recipes are missing from EMI unless JEI is installed next to it.
 EMIsemble adds native EMI categories for those mods.
 
