@@ -11,13 +11,16 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;
+import dev.emi.emi.api.recipe.handler.EmiCraftContext;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.wp.emisemble.Emisemble;
+import dev.wp.emisemble.porting.ClickSlots;
 import dev.wp.emisemble.porting.EmiRecipes;
 import dev.wp.emisemble.porting.TranslatedCategory;
 import dev.wp.emisemble.porting.TransferSlots;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -34,13 +37,12 @@ public final class ArcaneWorkbenchCompat {
             EmiRecipes.categoryId(TTRecipeTypes.ARCANE.get()), EmiStack.of(TTItems.ARCANE_WORKBENCH.get()),
             "jei.thaumaturge.category.arcane_workbench");
 
-    // JEI: addRecipeTransferHandler(MenuArcaneWorkbench, ARCANE_WORKBENCH, CRAFTING, 1, 9, 17, 36).
     private static final int RESULT_SLOT = 0;
-    private static final int GRID_START = 1;
-    private static final int GRID_CELLS = 9;
-    private static final int CRYSTAL_START = 10;
-    private static final int INVENTORY_START = 17;
-    private static final int INVENTORY_END = 53;
+    static final int GRID_START = 1;
+    static final int GRID_CELLS = 9;
+    static final int CRYSTAL_START = 10;
+    static final int INVENTORY_START = 17;
+    static final int INVENTORY_END = 53;
     private static final int WORKBENCH_SLOTS = GRID_CELLS + 6;
 
     private ArcaneWorkbenchCompat() {}
@@ -50,7 +52,7 @@ public final class ArcaneWorkbenchCompat {
         registry.addWorkstation(CATEGORY, EmiStack.of(TTItems.ARCANE_WORKBENCH.get()));
         int recipes = EmiRecipes.addAll(registry, TTRecipeTypes.ARCANE.get(), ArcaneWorkbenchEmiRecipe::of);
 
-        // The table also accepts vanilla crafting recipes, which JEI grants it as a second catalyst.
+        // The table takes vanilla crafting recipes too: JEI registers it as a catalyst in both categories.
         EmiRecipeCategory crafting = VanillaEmiRecipeCategories.CRAFTING;
         if (crafting != null) {
             registry.addWorkstation(crafting, EmiStack.of(TTItems.ARCANE_WORKBENCH.get()));
@@ -106,7 +108,7 @@ public final class ArcaneWorkbenchCompat {
         return indices;
     }
 
-    private static ArcaneCraftingRecipe hostRecipe(EmiRecipe recipe) {
+    static ArcaneCraftingRecipe hostRecipe(EmiRecipe recipe) {
         // The page keeps its host recipe private, but its id is the recipe's own, so the lookup resolves it.
         RecipeHolder<?> holder = recipe.getBackingRecipe();
         return holder != null && holder.value() instanceof ArcaneCraftingRecipe arcane ? arcane : null;
@@ -124,52 +126,18 @@ public final class ArcaneWorkbenchCompat {
     private static final class Handler implements StandardRecipeHandler<MenuArcaneWorkbench> {
         @Override
         public List<Slot> getInputSources(MenuArcaneWorkbench menu) {
-            // Grid and crystals first: the filler empties them into the inventory, so what the table holds is a source.
+            // Grid and crystals first, as EMI's own crafting handler lists a machine's inputs; the shading reads this.
             return TransferSlots.sources(getCraftingSlots(menu),
                     range(menu, INVENTORY_START, INVENTORY_END - INVENTORY_START));
         }
 
         @Override
         public List<Slot> getCraftingSlots(MenuArcaneWorkbench menu) {
-            // The clearing list has to be the superset: grid plus every crystal slot.
+            // Everything the fill may place into: the nine cells and one slot per primal.
             List<Slot> slots = new ArrayList<>(GRID_CELLS + MenuArcaneWorkbench.PRIMAL_ORDER.size());
             slots.addAll(range(menu, GRID_START, GRID_CELLS));
             slots.addAll(range(menu, CRYSTAL_START, MenuArcaneWorkbench.PRIMAL_ORDER.size()));
             return slots;
-        }
-
-        @Override
-        public List<Slot> getCraftingSlots(EmiRecipe recipe, MenuArcaneWorkbench menu) {
-            if (recipe == null) {
-                return List.of();
-            }
-            if (recipe.getCategory() != CATEGORY) {
-                // A vanilla crafting page: its inputs are already row-major over the nine cells.
-                return range(menu, GRID_START, GRID_CELLS);
-            }
-
-            ArcaneCraftingRecipe host = hostRecipe(recipe);
-            if (host == null) {
-                return List.of();
-            }
-
-            // Positional: EMI puts input i in plan[i], so the plan must follow the page's input order.
-            List<Integer> indices = inventorySlots(host);
-            List<Slot> plan = new ArrayList<>(indices.size());
-            for (int index : indices) {
-                int slot = index < GRID_CELLS ? GRID_START + index : CRYSTAL_START + index - GRID_CELLS;
-                if (slot < menu.slots.size()) {
-                    plan.add(menu.slots.get(slot));
-                }
-            }
-
-            // A short plan would drop ingredients into the wrong slots, which is worse than refusing the fill.
-            if (plan.size() != recipe.getInputs().size()) {
-                Emisemble.LOGGER.debug("thaumaturge: arcane workbench plan for {} has {} slots for {} inputs",
-                        recipe.getId(), plan.size(), recipe.getInputs().size());
-                return List.of();
-            }
-            return plan;
         }
 
         @Override
@@ -188,6 +156,33 @@ public final class ArcaneWorkbenchCompat {
             }
             EmiRecipeCategory crafting = VanillaEmiRecipeCategories.CRAFTING;
             return crafting != null && recipe.getCategory() == crafting;
+        }
+
+        @Override
+        public boolean canCraft(EmiRecipe recipe, EmiCraftContext<MenuArcaneWorkbench> context) {
+            return supportsRecipe(recipe)
+                    && ArcaneWorkbenchFill.canFill(recipe, context.getScreenHandler(), context.getAmount());
+        }
+
+        @Override
+        public boolean craft(EmiRecipe recipe, EmiCraftContext<MenuArcaneWorkbench> context) {
+            Minecraft client = Minecraft.getInstance();
+            MenuArcaneWorkbench menu = context.getScreenHandler();
+            if (client.player == null || client.gameMode == null || !menu.getCarried().isEmpty()) {
+                return false;
+            }
+            if (!supportsRecipe(recipe) || !ArcaneWorkbenchFill.fill(recipe, menu, context.getAmount())) {
+                return false;
+            }
+            Slot out = getOutputSlot(menu);
+            if (out != null && context.getDestination() != EmiCraftContext.Destination.NONE) {
+                if (context.getDestination() == EmiCraftContext.Destination.CURSOR) {
+                    ClickSlots.pickup(menu, out);
+                } else {
+                    ClickSlots.quickMove(menu, out);
+                }
+            }
+            return true;
         }
 
         private static List<Slot> range(MenuArcaneWorkbench menu, int start, int count) {
