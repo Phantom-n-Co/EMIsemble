@@ -260,6 +260,33 @@ idea {
 def curseforgeProject = findProperty('curseforge_project')
 def modrinthProject = findProperty('modrinth_project')
 
+// CurseForge slugs: the curse.maven coordinate prefix, or resolved through cfwidget by project id.
+def curseforgeHosts = [
+        'animal-pens', 'animus', 'apotheosis', 'apothic-enchanting',
+        'apothic-spawners', 'applied-thaumaturge', 'ars-additions', 'ars-elemental',
+        'chipped', 'construction-wand-kots', 'cooking-for-blockheads', 'dungeons-delight',
+        'embers-re-ignited', 'enchanted-witchcraft', 'enigmatic-legacy-plus', 'functional-storage',
+        'gateways-to-eternity', 'golem-overhaul', 'hexerei', 'horseman',
+        'hostile-neural-networks', 'immersive-engineering', 'lendercataclysm', 'malum',
+        'nutritional', 'pagans-blessing', 'rechiseled', 'risus',
+        'starbunclemania', 'super-factory-manager', 'thaumaturge', 'toxony',
+        'vanillabackport',
+        // Slug unknown so far: the mod id stands in and fails the upload until it is replaced.
+        'cognition', 'immersivepetroleum', 'mythsandlegends',
+]
+// Modrinth slugs: matched by the sha1 of the jar this mod builds against.
+def modrinthHosts = [
+        'animalpens', 'animus', 'apotheosis', 'apothic-enchanting',
+        'apothic-spawners', 'ars-additions', 'chipped', 'cognition',
+        'construction-wand-kots', 'cooking-for-blockheads', 'dungeons_delight', 'embers-re-ignited',
+        'enchanted-witchcraft', 'functional-storage', 'golem-overhaul', 'hexerei',
+        'horseman', 'hostile-neural-networks', 'immersivepetroleum', 'malum',
+        'myths-and-legends', 'rechiseled', 'risus', 'super-factory-manager',
+        'toxony', 'vanillabackport',
+        // Slug unknown so far: the mod id stands in and fails the upload until it is replaced.
+        'appliedthaumaturge', 'ars_elemental', 'cataclysm', 'enigmaticlegacyplus', 'gateways', 'immersiveengineering', 'nutritional', 'paganbless', 'starbunclemania', 'thaumaturge',
+]
+
 if (curseforgeProject || modrinthProject) {
     publishMods {
         file = tasks.named('jar').flatMap { it.archiveFile }
@@ -279,6 +306,7 @@ if (curseforgeProject || modrinthProject) {
                 client = true
                 server = false
                 requires('emi')
+                optional(curseforgeHosts as String[])
             }
         }
 
@@ -288,6 +316,7 @@ if (curseforgeProject || modrinthProject) {
                 accessToken = providers.environmentVariable('MODRINTH_API_KEY')
                 minecraftVersions.add(minecraft_version)
                 requires('emi')
+                optional(modrinthHosts as String[])
             }
         }
     }
