@@ -18,6 +18,7 @@ import dev.wp.emisemble.compat.cognition.infecting.InfectingCategory;
 import dev.wp.emisemble.compat.cognition.metamorphosis.MetamorphosisCategory;
 import dev.wp.emisemble.compat.cognition.metamorphosis.MetamorphosisEmiRecipe;
 import dev.wp.emisemble.porting.AlphaTextures;
+import dev.wp.emisemble.porting.TransferSlots;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -108,7 +109,8 @@ public final class CognitionCompat {
 
         @Override
         public List<Slot> getInputSources(MolecularMetamorpherMenu menu) {
-            return menu.slots.subList(PLAYER_START, menu.slots.size());
+            // Its own three inputs first: EMI empties them into the inventory before it fills.
+            return TransferSlots.sources(getCraftingSlots(menu), menu.slots.subList(PLAYER_START, menu.slots.size()));
         }
 
         @Override

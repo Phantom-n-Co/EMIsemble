@@ -17,6 +17,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.porting.EmiRecipes;
 import dev.wp.emisemble.porting.TranslatedCategory;
+import dev.wp.emisemble.porting.TransferSlots;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -123,10 +124,9 @@ public final class ArcaneWorkbenchCompat {
     private static final class Handler implements StandardRecipeHandler<MenuArcaneWorkbench> {
         @Override
         public List<Slot> getInputSources(MenuArcaneWorkbench menu) {
-            // Inventory only: the filler clears the whole table first, so nothing in it can be a source.
-            int end = Math.min(INVENTORY_END, menu.slots.size());
-            int start = Math.min(INVENTORY_START, end);
-            return menu.slots.subList(start, end);
+            // Grid and crystals first: the filler empties them into the inventory, so what the table holds is a source.
+            return TransferSlots.sources(getCraftingSlots(menu),
+                    range(menu, INVENTORY_START, INVENTORY_END - INVENTORY_START));
         }
 
         @Override

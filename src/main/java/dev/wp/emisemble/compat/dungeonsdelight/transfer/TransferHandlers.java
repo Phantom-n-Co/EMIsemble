@@ -5,6 +5,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.compat.dungeonsdelight.monster_cooking.MonsterCookingCategory;
+import dev.wp.emisemble.porting.TransferSlots;
 import net.minecraft.world.inventory.Slot;
 import net.yirmiri.dungeonsdelight.common.block.monster_pot.MonsterPotMenu;
 import net.yirmiri.dungeonsdelight.core.registry.DDMenuTypes;
@@ -25,7 +26,8 @@ public final class TransferHandlers {
         // JEI moves into slots 0-5, the six inputs, and sources from 9-44, the player's inventory and hotbar.
         @Override
         public List<Slot> getInputSources(MonsterPotMenu menu) {
-            return menu.slots.subList(9, 45);
+            // The pot's own six slots first: EMI empties them into the inventory before it fills.
+            return TransferSlots.sources(menu.slots.subList(0, 6), menu.slots.subList(9, 45));
         }
 
         @Override
