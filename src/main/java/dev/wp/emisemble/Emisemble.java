@@ -1,11 +1,16 @@
 package dev.wp.emisemble;
 
+import dev.wp.emisemble.compat.malum.spirit_drops.SpiritDropsData;
+import dev.wp.emisemble.compat.malum.spirit_drops.SpiritDropsSync;
 import dev.wp.emisemble.config.EmisembleConfig;
+import dev.wp.emisemble.network.SpiritDropsPayload;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +21,14 @@ public final class Emisemble {
 
     public Emisemble(IEventBus bus, ModContainer container) {
         container.registerConfig(ModConfig.Type.COMMON, EmisembleConfig.SPEC);
+        bus.addListener(Emisemble::registerPayloads);
+        NeoForge.EVENT_BUS.addListener(SpiritDropsSync::onDatapackSync);
+    }
+
+    /** Optional: a server may run this mod while its clients do not, and the payload is server to client only. */
+    private static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        event.registrar("1").optional().playToClient(SpiritDropsPayload.TYPE, SpiritDropsPayload.STREAM_CODEC,
+                (payload, context) -> SpiritDropsData.accept(payload));
     }
 
     /**

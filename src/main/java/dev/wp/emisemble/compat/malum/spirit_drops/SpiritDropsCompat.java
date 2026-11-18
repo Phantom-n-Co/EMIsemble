@@ -1,7 +1,5 @@
 package dev.wp.emisemble.compat.malum.spirit_drops;
 
-import com.sammy.malum.core.listeners.SpiritDataReloadListener;
-import com.sammy.malum.core.systems.spirit.EntitySpiritDropData;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -36,8 +34,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Which mob drops which spirits, read straight from Malum's own {@link SpiritDataReloadListener#SPIRIT_DATA}. The
- * same
+ * Spirit drops: the entries Malum's reload listener holds on an integrated server, or the copy a server running this
+ * mod sends on join. A server without the mod leaves the category empty, as JEI's own plugins do.
  */
 public final class SpiritDropsCompat {
     /** Own namespace: the page is ours, built from Malum's data, and owes nothing to a JEI-only addon's ids. */
@@ -55,23 +53,25 @@ public final class SpiritDropsCompat {
         registry.addCategory(CATEGORY);
         int added = 0;
         try {
-            List<Map.Entry<ResourceLocation, EntitySpiritDropData>> entries = new ArrayList<>(
-                    SpiritDataReloadListener.SPIRIT_DATA.entrySet());
+            List<Map.Entry<ResourceLocation, List<ItemStack>>> entries =
+                    new ArrayList<>(SpiritDropsData.drops().entrySet());
             entries.sort(Comparator.comparing(e -> e.getKey().toString()));
-            for (Map.Entry<ResourceLocation, EntitySpiritDropData> entry : entries) {
-                List<ItemStack> drops = entry.getValue().getSpiritStacks().stream().filter(s -> !s.isEmpty()).toList();
-                if (drops.isEmpty() || !BuiltInRegistries.ENTITY_TYPE.containsKey(entry.getKey())) {
+            for (Map.Entry<ResourceLocation, List<ItemStack>> entry : entries) {
+                if (!BuiltInRegistries.ENTITY_TYPE.containsKey(entry.getKey())) {
                     continue;
                 }
                 try {
-                    registry.addRecipe(new Page(entry.getKey(), drops));
+                    registry.addRecipe(new Page(entry.getKey(), entry.getValue()));
                     added++;
                 } catch (Throwable t) {
                     Emisemble.LOGGER.warn("Skipping spirit drop page for {}", entry.getKey(), t);
                 }
             }
+            if (entries.isEmpty()) {
+                Emisemble.LOGGER.warn("malum: no spirit drop data; a remote server needs this mod to send it");
+            }
         } catch (Throwable t) {
-            Emisemble.LOGGER.warn("malum: spirit drop data unavailable; pages appear on the next reload", t);
+            Emisemble.LOGGER.warn("malum: spirit drop data unavailable", t);
         }
         Emisemble.LOGGER.info("malum: {} spirit drop recipes registered", added);
         return added;
