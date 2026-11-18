@@ -14,6 +14,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.porting.EmiRecipes;
 import dev.wp.emisemble.porting.TranslatedCategory;
+import dev.wp.emisemble.porting.TransferSlots;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
@@ -68,10 +69,15 @@ public final class SpellstoneCompat {
     /** JEI's {@code addRecipeTransferHandler(SpellstoneTableMenu, …, 0, 10, 11, 36)} in EMI's shape. */
     private static final class Handler implements StandardRecipeHandler<SpellstoneTableMenu> {
         private static final int CRAFT_SLOTS = 10;
+        private static final int INVENTORY_START = 11;
+        private static final int INVENTORY_SLOTS = 36;
 
         @Override
         public List<Slot> getInputSources(SpellstoneTableMenu menu) {
-            return menu.slots.subList(0, CRAFT_SLOTS);
+            // The table's cells first, as EMI's filler empties them into the inventory before it fills.
+            return TransferSlots.sources(getCraftingSlots(menu), menu.slots.subList(
+                    Math.min(INVENTORY_START, menu.slots.size()),
+                    Math.min(INVENTORY_START + INVENTORY_SLOTS, menu.slots.size())));
         }
 
         @Override

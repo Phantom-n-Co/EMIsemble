@@ -7,6 +7,7 @@ import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.compat.enchanted.byproduct.ByproductCategory;
 import dev.wp.emisemble.compat.enchanted.distilling.DistillingCategory;
 import dev.wp.emisemble.compat.enchanted.spinning.SpinningCategory;
+import dev.wp.emisemble.porting.TransferSlots;
 import net.favouriteless.enchanted.common.init.EMenuTypes;
 import net.favouriteless.enchanted.common.menus.DistilleryMenu;
 import net.favouriteless.enchanted.common.menus.SpinningWheelMenu;
@@ -30,7 +31,8 @@ public final class TransferHandlers {
     private static final class WitchOvenHandler implements StandardRecipeHandler<WitchOvenMenu> {
         @Override
         public List<Slot> getInputSources(WitchOvenMenu menu) {
-            return menu.slots.subList(5, menu.slots.size());
+            // Its own slots first: EMI empties them into the inventory before it fills.
+            return TransferSlots.sources(getCraftingSlots(menu), menu.slots.subList(5, menu.slots.size()));
         }
 
         @Override
@@ -47,7 +49,7 @@ public final class TransferHandlers {
     private static final class SpinningWheelHandler implements StandardRecipeHandler<SpinningWheelMenu> {
         @Override
         public List<Slot> getInputSources(SpinningWheelMenu menu) {
-            return menu.slots.subList(4, menu.slots.size());
+            return TransferSlots.sources(getCraftingSlots(menu), menu.slots.subList(4, menu.slots.size()));
         }
 
         @Override
@@ -65,7 +67,7 @@ public final class TransferHandlers {
         // JEI's handler starts the inventory at slot 5, which is one of the distillery's own output slots; 7 is the player's.
         @Override
         public List<Slot> getInputSources(DistilleryMenu menu) {
-            return menu.slots.subList(7, menu.slots.size());
+            return TransferSlots.sources(getCraftingSlots(menu), menu.slots.subList(7, menu.slots.size()));
         }
 
         @Override

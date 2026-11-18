@@ -20,6 +20,7 @@ import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.porting.EmiRecipes;
 import dev.wp.emisemble.porting.InfoText;
 import dev.wp.emisemble.porting.TranslatedCategory;
+import dev.wp.emisemble.porting.TransferSlots;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
@@ -171,8 +172,10 @@ public final class GemCuttingCompat {
     private static final class Handler implements StandardRecipeHandler<GemCuttingMenu> {
         @Override
         public List<Slot> getInputSources(GemCuttingMenu menu) {
-            return menu.slots.subList(Math.min(INPUT_SLOTS, menu.slots.size()),
-                    Math.min(INPUT_SLOTS + PLAYER_SLOTS, menu.slots.size()));
+            // The four table slots come first: EMI empties them into the inventory before it fills.
+            return TransferSlots.sources(getCraftingSlots(menu), menu.slots.subList(
+                    Math.min(INPUT_SLOTS, menu.slots.size()),
+                    Math.min(INPUT_SLOTS + PLAYER_SLOTS, menu.slots.size())));
         }
 
         @Override

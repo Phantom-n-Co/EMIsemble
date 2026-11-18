@@ -7,6 +7,7 @@ import dev.emi.emi.api.recipe.EmiRecipe;
 import dev.emi.emi.api.recipe.handler.StandardRecipeHandler;
 import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.compat.cataclysm.weapon_infusion.WeaponInfusionCategory;
+import dev.wp.emisemble.porting.TransferSlots;
 import net.minecraft.world.inventory.Slot;
 
 import java.util.List;
@@ -25,7 +26,8 @@ public final class WeaponFusionHandler {
         // JEI's slots 0-5 with the inventory from 9 take the anvil's result as an input and orphan six player slots.
         @Override
         public List<Slot> getInputSources(WeaponfusionMenu menu) {
-            return menu.slots.subList(3, menu.slots.size());
+            // The two inputs come first: EMI empties them into the inventory before it fills.
+            return TransferSlots.sources(menu.slots.subList(0, 2), menu.slots.subList(3, menu.slots.size()));
         }
 
         @Override

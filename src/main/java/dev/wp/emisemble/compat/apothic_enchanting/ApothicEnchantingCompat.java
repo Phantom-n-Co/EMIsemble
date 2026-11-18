@@ -17,6 +17,7 @@ import dev.shadowsoffire.apothic_enchanting.table.infusion.InfusionRecipe;
 import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.porting.EmiRecipes;
 import dev.wp.emisemble.porting.TranslatedCategory;
+import dev.wp.emisemble.porting.TransferSlots;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -188,7 +189,8 @@ public final class ApothicEnchantingCompat {
     private static final class RavenHandler implements StandardRecipeHandler<RavenEnchantmentMenu> {
         @Override
         public List<Slot> getInputSources(RavenEnchantmentMenu menu) {
-            return slots(menu, RAVEN_INVENTORY, RAVEN_INVENTORY_SIZE);
+            // The infusion input first: EMI empties it into the inventory before it fills.
+            return TransferSlots.sources(getCraftingSlots(menu), slots(menu, RAVEN_INVENTORY, RAVEN_INVENTORY_SIZE));
         }
 
         @Override
