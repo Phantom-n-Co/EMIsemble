@@ -1,0 +1,46 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+logoFile="assets/${mod_id}/logo.png"
+authors="${mod_authors}"
+description='''
+Native EMI recipe categories for mods that only ship a JEI plugin.
+'''
+[[mixins]]
+config="emisemble.mixins.json"
+[[dependencies.emisemble]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${neo_version},)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.emisemble]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft_version_range}"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.emisemble]]
+    modId="emi"
+    type="optional"
+    versionRange="${emi_version_range}"
+    ordering="AFTER"
+    side="CLIENT"
+[[dependencies.emisemble]]
+    modId="extra_apoth_compat"
+    type="incompatible"
+    versionRange="[0,)"
+    ordering="NONE"
+    side="BOTH"
+    reason="Both mods register the same Apotheosis, Apothic Enchanting and Apothic Spawners viewer pages, so every recipe would appear twice under one id. Disable the compat's EMI option or remove this mod."
+[[dependencies.emisemble]]
+    modId="justenoughspirits"
+    type="discouraged"
+    versionRange="[0,)"
+    ordering="NONE"
+    side="BOTH"
+    reason="This mod shows Malum's spirit drops as a native EMI category, so the addon would duplicate them."

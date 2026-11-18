@@ -1,0 +1,294 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.141'
+    id 'idea'
+    id 'me.modmuss50.mod-publish-plugin' version '2.2.1'
+}
+
+tasks.named('wrapper', Wrapper).configure {
+    distributionType = Wrapper.DistributionType.BIN
+}
+
+version = mod_version
+group = mod_group_id
+
+// Which recipe viewer is in the dev runtime: emi (default), jei, both or none. Parity checks need one at a time.
+def viewerCompat = providers.gradleProperty('viewerCompat').getOrElse('emi')
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven {
+        name = 'TerraformersMC'
+        url = 'https://maven.terraformersmc.com/releases/'
+    }
+
+    maven {
+        name = 'Modrinth'
+        url = 'https://api.modrinth.com/maven'
+    }
+
+    maven {
+        name = 'BlameJared'
+        url = 'https://maven.blamejared.com'
+    }
+
+    maven {
+        name = 'IllusiveC4'
+        url = 'https://maven.theillusivec4.top/'
+    }
+
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'CurseForge'
+                url = 'https://cursemaven.com'
+            }
+        }
+        filter {
+            includeGroup 'curse.maven'
+        }
+    }
+}
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        client {
+            client()
+        }
+
+        clientQuick {
+            client()
+            programArguments.addAll '--quickPlaySingleplayer', 'emi-test'
+        }
+
+        configureEach {
+            logLevel = org.slf4j.event.Level.DEBUG
+            jvmArguments.addAll '-Xmx6G'
+        }
+    }
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    compileOnly "dev.emi:emi-neoforge:${emi_version}"
+
+    // One viewer per run: with both installed, JEMI hides the other mod's JEI categories and a parity probe
+    // reads zero. -PviewerCompat=jei / emi.
+    if (viewerCompat == 'emi' || viewerCompat == 'both') {
+        localRuntime "dev.emi:emi-neoforge:${emi_version}"
+    }
+    if (viewerCompat == 'jei' || viewerCompat == 'both') {
+        localRuntime "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
+    }
+
+    implementation "curse.maven:thaumaturge-1628024:9452543"
+
+    implementation "maven.modrinth:geckolib:Grwn5rUB"
+    localRuntime "maven.modrinth:terrablender:6e8GCrLb"
+    compileOnly "maven.modrinth:titanium:ipoFMkfv"
+    localRuntime "maven.modrinth:titanium:ipoFMkfv"
+    compileOnly "maven.modrinth:balm:gMedgtzL"
+    localRuntime "maven.modrinth:balm:gMedgtzL"
+    implementation "maven.modrinth:hostile-neural-networks:ikdLP02G"
+    implementation "maven.modrinth:functional-storage:FWnouoF2"
+    implementation "maven.modrinth:cooking-for-blockheads:ZjiYlt4A"
+    implementation "curse.maven:animal-pens-1206722:9291589"
+    implementation "curse.maven:enchanted-witchcraft-560363:8055168"
+    implementation "curse.maven:pagans-blessing-952071:5889348"
+    compileOnly "maven.modrinth:architectury-api:xGfBrBzj"
+    localRuntime "maven.modrinth:architectury-api:xGfBrBzj"
+    compileOnly "maven.modrinth:stateobserver:UBLIkKTR"
+    localRuntime "maven.modrinth:stateobserver:UBLIkKTR"
+    compileOnly "maven.modrinth:modopedia:VlvXeRGz"
+    localRuntime "maven.modrinth:modopedia:VlvXeRGz"
+    implementation "curse.maven:animus-229664:9544277"
+    implementation "curse.maven:super-factory-manager-306935:8370241"
+    implementation "curse.maven:ars-additions-974408:7646325"
+    implementation "curse.maven:chipped-456956:5813117"
+    implementation "curse.maven:rechiseled-chipped-1007578:7524185"
+    implementation "curse.maven:rechiseled-558998:8875899"
+    implementation "curse.maven:golem-overhaul-618752:8521968"
+    implementation "curse.maven:risus-1159950:8778385"
+    implementation "curse.maven:horseman-1082085:8734097"
+    implementation "curse.maven:vanillabackport-417430:9318571"
+    implementation "curse.maven:gateways-to-eternity-417802:6926284"
+    implementation "curse.maven:nutritional-1579319:9456986"
+    implementation "curse.maven:construction-wand-kots-1382688:9392199"
+    compileOnly "curse.maven:farmers-delight-398521:8765184"
+    localRuntime "curse.maven:farmers-delight-398521:8765184"
+    compileOnly "curse.maven:runiclib-880879:8188562"
+    localRuntime "curse.maven:runiclib-880879:8188562"
+    compileOnly "curse.maven:neovitae-1404763:9544100"
+    localRuntime "curse.maven:neovitae-1404763:9544100"
+    compileOnly "curse.maven:modonomicon-538392:9384356"
+    localRuntime "curse.maven:modonomicon-538392:9384356"
+    compileOnly "curse.maven:ars-nouveau-401955:9521184"
+    localRuntime "curse.maven:ars-nouveau-401955:9521184"
+    compileOnly "curse.maven:resourceful-lib-570073:5973188"
+    localRuntime "curse.maven:resourceful-lib-570073:5973188"
+    compileOnly "curse.maven:resourceful-config-714059:6467772"
+    localRuntime "curse.maven:resourceful-config-714059:6467772"
+    compileOnly "curse.maven:athena-841890:8061947"
+    localRuntime "curse.maven:athena-841890:8061947"
+    compileOnly "curse.maven:fusion-connected-textures-854949:9070353"
+    localRuntime "curse.maven:fusion-connected-textures-854949:9070353"
+    compileOnly "curse.maven:platform-997634:9318519"
+    localRuntime "curse.maven:platform-997634:9318519"
+    implementation "curse.maven:starbunclemania-746215:8964554"
+    implementation "curse.maven:ars-elemental-561470:9057244"
+    implementation "curse.maven:applied-thaumaturge-1718689:9498175"
+    implementation "curse.maven:apothic-cataclysm-1214893:6320972"
+    implementation "curse.maven:dungeons-delight-1258923:9446248"
+    compileOnly "curse.maven:supermartijn642s-core-lib-454372:9447150"
+    localRuntime "curse.maven:supermartijn642s-core-lib-454372:9447150"
+    compileOnly "curse.maven:supermartijn642s-config-lib-438332:5546996"
+    localRuntime "curse.maven:supermartijn642s-config-lib-438332:5546996"
+    compileOnly "curse.maven:applied-energistics-2-223794:9519988"
+    localRuntime "curse.maven:applied-energistics-2-223794:9519988"
+    localRuntime "curse.maven:guideme-1173950:9366366"
+    localRuntime "curse.maven:lionfish-api-1001614:8345326"
+    compileOnly "curse.maven:lendercataclysm-551586:8931182"
+    localRuntime "curse.maven:lendercataclysm-551586:8931182"
+    implementation "curse.maven:embers-re-ignited-1579725:9130942"
+    implementation "maven.modrinth:toxony:pDu34HNo"
+    implementation "maven.modrinth:cognition:2.4.13"
+    implementation "maven.modrinth:myths-and-legends:1.1.0"
+    implementation "maven.modrinth:immersivepetroleum:4.5.0-39"
+    implementation "blusunrize.immersiveengineering:ImmersiveEngineering:1.21.1-12.4.2-194"
+    implementation "curse.maven:enigmatic-legacy-plus-1391021:9141458"
+
+    implementation "curse.maven:hexerei-548599:6376510"
+
+    // Apotheosis and its addons.
+    implementation "curse.maven:apotheosis-313970:8993983"
+    implementation "curse.maven:apothic-enchanting-1063926:9095862"
+    implementation "curse.maven:apothic-spawners-986583:8469405"
+    compileOnly "curse.maven:placebo-283644:9153039"
+    localRuntime "curse.maven:placebo-283644:9153039"
+    localRuntime "curse.maven:apothic-attributes-898963:9006294"
+
+    implementation "curse.maven:malum-484064:7307339"
+    compileOnly "curse.maven:lodestone-616457:7264731"
+    localRuntime "curse.maven:lodestone-616457:7264731"
+
+    // Thaumaturge's own required deps, needed only to boot the dev client.
+    localRuntime "maven.modrinth:lithostitched:1.8.1-neoforge-21.1"
+    localRuntime "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1"
+
+    // Enigmatic Legacy Plus' required deps.
+    localRuntime "maven.modrinth:patchouli:1.21.1-93-neoforge"
+    localRuntime "com.illusivesoulworks.caelus:caelus-neoforge:7.0.1+1.21.1"
+
+    // Dev only: thaumaturge (+ some other mods?) cause experimental settings screen to show up, don't want that
+    localRuntime "curse.maven:yeetusexperimentus-635427:5444189"
+}
+
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            loader_version_range   : loader_version_range,
+            emi_version_range      : emi_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+            mod_authors            : mod_authors,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from("src/main/templates") {
+        include "META-INF/**"
+    }
+    into "build/generated/sources/modMetadata"
+}
+
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/repo"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
+
+// Each platform stays unconfigured until its listing exists, so publishMods cannot upload to an empty id.
+def curseforgeProject = findProperty('curseforge_project')
+def modrinthProject = findProperty('modrinth_project')
+
+if (curseforgeProject || modrinthProject) {
+    publishMods {
+        file = tasks.named('jar').flatMap { it.archiveFile }
+        version = project.version
+        changelog = providers.environmentVariable('CHANGELOG').orElse('See the GitHub release notes')
+        displayName = "${mod_name} ${project.version}"
+        type = me.modmuss50.mpp.ReleaseType.of(mod_version.contains('alpha') ? 'alpha' : mod_version.contains('beta') ? 'beta' : 'stable')
+        modLoaders.add('neoforge')
+        dryRun = providers.gradleProperty('publishDryRun').isPresent()
+
+        if (curseforgeProject) {
+            curseforge {
+                projectId = curseforgeProject
+                accessToken = providers.environmentVariable('CURSEFORGE_API_KEY')
+                javaVersions.add(JavaVersion.VERSION_21)
+                minecraftVersions.add(minecraft_version)
+                client = true
+                server = false
+                requires('emi')
+            }
+        }
+
+        if (modrinthProject) {
+            modrinth {
+                projectId = modrinthProject
+                accessToken = providers.environmentVariable('MODRINTH_API_KEY')
+                minecraftVersions.add(minecraft_version)
+                requires('emi')
+            }
+        }
+    }
+}

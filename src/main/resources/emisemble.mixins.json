@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "dev.wp.emisemble.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+    "EmiRecipeManagerMixin",
+    "EmiRenderHelperMixin",
+    "EmiStackIndexGroupMixin",
+    "EmiStackListInvoker",
+    "EmiStackListMixin",
+    "WidgetGroupMixin"
+  ],
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
