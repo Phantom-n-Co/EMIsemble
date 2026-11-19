@@ -23,13 +23,12 @@ repositories {
     maven {
         name = 'TerraformersMC'
         url = 'https://maven.terraformersmc.com/releases/'
+        content {
+            includeGroup 'dev.emi'
+        }
     }
 
-    maven {
-        name = 'Modrinth'
-        url = 'https://api.modrinth.com/maven'
-    }
-
+    // JEI, Immersive Engineering, Ars Nouveau, Malum/Lodestone, Titanium, Patchouli.
     maven {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
@@ -38,6 +37,102 @@ repositories {
     maven {
         name = 'IllusiveC4'
         url = 'https://maven.theillusivec4.top/'
+        content {
+            includeGroup 'top.theillusivec4.curios'
+            includeGroup 'com.illusivesoulworks.caelus'
+        }
+    }
+
+    maven {
+        name = 'GeckoLib'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroup 'software.bernie.geckolib'
+        }
+    }
+
+    maven {
+        name = 'KliKli'
+        url = 'https://dl.cloudsmith.io/public/klikli-dev/mods/maven/'
+        content {
+            includeGroup 'com.klikli_dev'
+        }
+    }
+
+    maven {
+        name = 'Shadows of Fire'
+        url = 'https://maven.shadowsoffire.dev/releases'
+        content {
+            includeGroup 'dev.shadowsoffire'
+        }
+    }
+
+    maven {
+        name = 'Twelve Iterations'
+        url = 'https://maven.twelveiterations.com/repository/maven-public/'
+        content {
+            includeGroup 'net.blay09.mods'
+        }
+    }
+
+    maven {
+        name = 'Team Resourceful'
+        url = 'https://maven.teamresourceful.com/repository/maven-public/'
+        content {
+            includeGroupByRegex 'com\\.teamresourceful.*'
+            includeGroupByRegex 'earth\\.terrarium.*'
+        }
+    }
+
+    maven {
+        name = 'Favouriteless'
+        url = 'https://maven.favouriteless.dev/releases'
+        content {
+            includeGroupByRegex 'net\\.favouriteless.*'
+        }
+    }
+
+    maven {
+        name = 'Architectury'
+        url = 'https://maven.architectury.dev/'
+        content {
+            includeGroup 'dev.architectury'
+        }
+    }
+
+    maven {
+        name = 'BreakInBlocks'
+        url = 'https://maven.breakinblocks.com/releases'
+        content {
+            includeGroupByRegex 'com\\.breakinblocks.*'
+        }
+    }
+
+    maven {
+        name = 'MinecraftForge'
+        url = 'https://maven.minecraftforge.net'
+        content {
+            includeGroup 'com.github.glitchfiend'
+        }
+    }
+
+    // Thaumaturge, but doesn't have 1.21.1 version >:(
+//    maven {
+//        name = "Leclown"
+//        url = "https://maven.leclowndu93150.dev/releases"
+//    }
+
+    // Hosts without an author maven: these two are the only sources for their mods.
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter {
+            includeGroup 'maven.modrinth'
+        }
     }
 
     exclusiveContent {
@@ -106,106 +201,104 @@ dependencies {
         localRuntime "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
     }
 
-    implementation "curse.maven:thaumaturge-1628024:9452543"
+    implementation("software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.3") { transitive = false }
+    localRuntime("com.github.glitchfiend:TerraBlender-neoforge:1.21.1-4.1.0.8") { transitive = false }
+    compileOnly("com.hrznstudio:titanium:1.21-4.0.56") { transitive = false }
+    localRuntime("com.hrznstudio:titanium:1.21-4.0.56") { transitive = false }
+    compileOnly("net.blay09.mods:balm-neoforge:21.0.67+1.21.1") { transitive = false }
+    localRuntime("net.blay09.mods:balm-neoforge:21.0.67+1.21.1") { transitive = false }
+    implementation("dev.shadowsoffire:HostileNeuralNetworks:1.21.1-6.5.1") { transitive = false }
+    compileOnly("dev.architectury:architectury-neoforge:13.0.12") { transitive = false }
+    localRuntime("dev.architectury:architectury-neoforge:13.0.12") { transitive = false }
+    implementation("com.breakinblocks.animusnv:AnimusNV:1.21.1-5.2.26") { transitive = false }
+    implementation("dev.shadowsoffire:GatewaysToEternity:1.21.1-5.1.0") { transitive = false }
+    compileOnly("com.breakinblocks.neovitae:neovitae:1.21.1-1.1.53") { transitive = false }
+    localRuntime("com.breakinblocks.neovitae:neovitae:1.21.1-1.1.53") { transitive = false }
+    compileOnly("com.klikli_dev:modonomicon-1.21.1-neoforge:1.123.0") { transitive = false }
+    localRuntime("com.klikli_dev:modonomicon-1.21.1-neoforge:1.123.0") { transitive = false }
+    compileOnly("com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1:5.13.5.1445") { transitive = false }
+    localRuntime("com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1:5.13.5.1445") { transitive = false }
+    compileOnly("com.teamresourceful.resourcefullib:resourcefullib-neoforge-1.21:3.0.12") { transitive = false }
+    localRuntime("com.teamresourceful.resourcefullib:resourcefullib-neoforge-1.21:3.0.12") { transitive = false }
+    compileOnly("com.teamresourceful.resourcefulconfig:resourcefulconfig-neoforge-1.21:3.0.11") { transitive = false }
+    localRuntime("com.teamresourceful.resourcefulconfig:resourcefulconfig-neoforge-1.21:3.0.11") { transitive = false }
+    implementation("com.alexthw.starbunclemania:starbunclemania-1.21.1:1.5.9.50") { transitive = false }
+    implementation("com.alexthw.ars_elemental:ars_elemental-1.21.1:0.7.10.4.191") { transitive = false }
+    compileOnly("org.appliedenergistics:appliedenergistics2:19.2.19") { transitive = false }
+    localRuntime("org.appliedenergistics:appliedenergistics2:19.2.19") { transitive = false }
+    localRuntime("org.appliedenergistics:guideme:21.1.22") { transitive = false }
+    implementation("com.sammy.malum:malum:1.21.1-1.8.2.150") { transitive = false }
+    compileOnly("team.lodestar.lodestone:lodestone:1.21.1-1.8.2.523") { transitive = false }
+    localRuntime("team.lodestar.lodestone:lodestone:1.21.1-1.8.2.523") { transitive = false }
 
-    implementation "maven.modrinth:geckolib:Grwn5rUB"
-    localRuntime "maven.modrinth:terrablender:6e8GCrLb"
-    compileOnly "maven.modrinth:titanium:ipoFMkfv"
-    localRuntime "maven.modrinth:titanium:ipoFMkfv"
-    compileOnly "maven.modrinth:balm:gMedgtzL"
-    localRuntime "maven.modrinth:balm:gMedgtzL"
-    implementation "maven.modrinth:hostile-neural-networks:ikdLP02G"
-    implementation "maven.modrinth:functional-storage:FWnouoF2"
-    implementation "maven.modrinth:cooking-for-blockheads:ZjiYlt4A"
-    implementation "curse.maven:animal-pens-1206722:9291589"
-    implementation "curse.maven:enchanted-witchcraft-560363:8055168"
-    implementation "curse.maven:pagans-blessing-952071:5889348"
-    compileOnly "maven.modrinth:architectury-api:xGfBrBzj"
-    localRuntime "maven.modrinth:architectury-api:xGfBrBzj"
-    compileOnly "maven.modrinth:stateobserver:UBLIkKTR"
-    localRuntime "maven.modrinth:stateobserver:UBLIkKTR"
-    compileOnly "maven.modrinth:modopedia:VlvXeRGz"
-    localRuntime "maven.modrinth:modopedia:VlvXeRGz"
-    implementation "curse.maven:animus-229664:9544277"
-    implementation "curse.maven:super-factory-manager-306935:8370241"
-    implementation "curse.maven:ars-additions-974408:7646325"
-    implementation "curse.maven:chipped-456956:5813117"
-    implementation "curse.maven:rechiseled-chipped-1007578:7524185"
-    implementation "curse.maven:rechiseled-558998:8875899"
-    implementation "curse.maven:golem-overhaul-618752:8521968"
-    implementation "curse.maven:risus-1159950:8778385"
-    implementation "curse.maven:horseman-1082085:8734097"
-    implementation "curse.maven:vanillabackport-417430:9318571"
-    implementation "curse.maven:gateways-to-eternity-417802:6926284"
-    implementation "curse.maven:nutritional-1579319:9456986"
-    implementation "curse.maven:construction-wand-kots-1382688:9392199"
-    compileOnly "curse.maven:farmers-delight-398521:8765184"
-    localRuntime "curse.maven:farmers-delight-398521:8765184"
-    compileOnly "curse.maven:runiclib-880879:8188562"
-    localRuntime "curse.maven:runiclib-880879:8188562"
-    compileOnly "curse.maven:neovitae-1404763:9544100"
-    localRuntime "curse.maven:neovitae-1404763:9544100"
-    compileOnly "curse.maven:modonomicon-538392:9384356"
-    localRuntime "curse.maven:modonomicon-538392:9384356"
-    compileOnly "curse.maven:ars-nouveau-401955:9521184"
-    localRuntime "curse.maven:ars-nouveau-401955:9521184"
-    compileOnly "curse.maven:resourceful-lib-570073:5973188"
-    localRuntime "curse.maven:resourceful-lib-570073:5973188"
-    compileOnly "curse.maven:resourceful-config-714059:6467772"
-    localRuntime "curse.maven:resourceful-config-714059:6467772"
-    compileOnly "curse.maven:athena-841890:8061947"
-    localRuntime "curse.maven:athena-841890:8061947"
-    compileOnly "curse.maven:fusion-connected-textures-854949:9070353"
-    localRuntime "curse.maven:fusion-connected-textures-854949:9070353"
-    compileOnly "curse.maven:platform-997634:9318519"
-    localRuntime "curse.maven:platform-997634:9318519"
-    implementation "curse.maven:starbunclemania-746215:8964554"
-    implementation "curse.maven:ars-elemental-561470:9057244"
-    implementation "curse.maven:applied-thaumaturge-1718689:9498175"
-    implementation "curse.maven:apothic-cataclysm-1214893:6320972"
-    implementation "curse.maven:dungeons-delight-1258923:9446248"
-    compileOnly "curse.maven:supermartijn642s-core-lib-454372:9447150"
-    localRuntime "curse.maven:supermartijn642s-core-lib-454372:9447150"
-    compileOnly "curse.maven:supermartijn642s-config-lib-438332:5546996"
-    localRuntime "curse.maven:supermartijn642s-config-lib-438332:5546996"
-    compileOnly "curse.maven:applied-energistics-2-223794:9519988"
-    localRuntime "curse.maven:applied-energistics-2-223794:9519988"
-    localRuntime "curse.maven:guideme-1173950:9366366"
-    localRuntime "curse.maven:lionfish-api-1001614:8345326"
-    compileOnly "curse.maven:lendercataclysm-551586:8931182"
-    localRuntime "curse.maven:lendercataclysm-551586:8931182"
-    implementation "curse.maven:embers-re-ignited-1579725:9130942"
+    implementation("net.favouriteless.enchanted:enchanted-neoforge-1.21.1:4.2.7") { transitive = false }
+    compileOnly("net.favouriteless.stateobserver:stateobserver-neoforge-1.21.1:1.6.4") { transitive = false }
+    localRuntime("net.favouriteless.stateobserver:stateobserver-neoforge-1.21.1:1.6.4") { transitive = false }
+    compileOnly("net.favouriteless.modopedia:modopedia-neoforge-1.21.1:1.1.11") { transitive = false }
+    localRuntime("net.favouriteless.modopedia:modopedia-neoforge-1.21.1:1.1.11") { transitive = false }
+
+    implementation("earth.terrarium.chipped:chipped-neoforge-1.21.1:4.0.2") { transitive = false }
+    compileOnly("earth.terrarium.athena:athena-neoforge-1.21.1:4.0.6") { transitive = false }
+    localRuntime("earth.terrarium.athena:athena-neoforge-1.21.1:4.0.6") { transitive = false }
+
+    implementation "maven.modrinth:functional-storage:1.21-1.5.7"
+    implementation "maven.modrinth:cooking-for-blockheads:21.1.25+neoforge-1.21.1"
+    implementation "maven.modrinth:animalpens:2.5.2-1.21+NeoForge"
+    implementation "maven.modrinth:super-factory-manager:HWz24fIm"
+    implementation "maven.modrinth:ars-additions:21.3.0"
+    implementation "maven.modrinth:rechiseled-chipped:2.0"
+    implementation "maven.modrinth:rechiseled:1.2.6-neoforge-mc1.21"
+    implementation "maven.modrinth:golem-overhaul:V1OtffxB"
+    implementation "maven.modrinth:risus:0.8.600"
+    implementation "maven.modrinth:horseman:1.5.13"
+    implementation "maven.modrinth:vanillabackport:mGS7BxD4"
+    implementation "maven.modrinth:construction-wand-kots:2.16.13"
+    compileOnly "maven.modrinth:farmers-delight:1.21.1-1.3.4"
+    localRuntime "maven.modrinth:farmers-delight:1.21.1-1.3.4"
+    compileOnly "maven.modrinth:runiclib:tk5EQpUG"
+    localRuntime "maven.modrinth:runiclib:tk5EQpUG"
+    compileOnly "maven.modrinth:fusion-connected-textures:1.3.16-neoforge-mc1.21.1"
+    localRuntime "maven.modrinth:fusion-connected-textures:1.3.16-neoforge-mc1.21.1"
+    compileOnly "maven.modrinth:platform:rh4p4ixM"
+    localRuntime "maven.modrinth:platform:rh4p4ixM"
+    implementation "maven.modrinth:dungeons_delight:1.5.3"
+    compileOnly "maven.modrinth:supermartijn642s-core-lib:1.1.26a-neoforge-mc1.21"
+    localRuntime "maven.modrinth:supermartijn642s-core-lib:1.1.26a-neoforge-mc1.21"
+    compileOnly "maven.modrinth:supermartijn642s-config-lib:1.1.8-neoforge-mc1.21"
+    localRuntime "maven.modrinth:supermartijn642s-config-lib:1.1.8-neoforge-mc1.21"
+    localRuntime "maven.modrinth:lionfish-api:3.1"
+    compileOnly "maven.modrinth:l_enders-cataclysm:3.33"
+    localRuntime "maven.modrinth:l_enders-cataclysm:3.33"
+    implementation "maven.modrinth:embers-re-ignited:1.21.1-1.5.9"
     implementation "maven.modrinth:toxony:pDu34HNo"
     implementation "maven.modrinth:cognition:2.4.13"
     implementation "maven.modrinth:myths-and-legends:1.1.0"
     implementation "maven.modrinth:immersivepetroleum:4.5.0-39"
+    implementation "maven.modrinth:enigmaticlegacy-plus:1.21.1-1.1.2"
+    implementation "maven.modrinth:hexerei:0.5.0.3"
     implementation "blusunrize.immersiveengineering:ImmersiveEngineering:1.21.1-12.4.2-194"
-    implementation "curse.maven:enigmatic-legacy-plus-1391021:9141458"
 
-    implementation "curse.maven:hexerei-548599:6376510"
+    implementation "curse.maven:thaumaturge-1628024:9452543"
+    implementation "curse.maven:applied-thaumaturge-1718689:9498175"
+    implementation "curse.maven:apothic-cataclysm-1214893:6320972"
+    implementation "curse.maven:pagans-blessing-952071:5889348"
+    implementation "curse.maven:nutritional-1579319:9456986"
 
-    // Apotheosis and its addons.
-    implementation "curse.maven:apotheosis-313970:8993983"
-    implementation "curse.maven:apothic-enchanting-1063926:9095862"
-    implementation "curse.maven:apothic-spawners-986583:8469405"
-    compileOnly "curse.maven:placebo-283644:9153039"
-    localRuntime "curse.maven:placebo-283644:9153039"
-    localRuntime "curse.maven:apothic-attributes-898963:9006294"
+    implementation("dev.shadowsoffire:Apotheosis:1.21.1-8.9.0") { transitive = false }
+    implementation("dev.shadowsoffire:ApothicEnchanting:1.21.1-1.6.4") { transitive = false }
+    implementation("dev.shadowsoffire:ApothicSpawners:1.21.1-1.4.0") { transitive = false }
+    compileOnly("dev.shadowsoffire:Placebo:1.21.1-9.9.4") { transitive = false }
+    localRuntime("dev.shadowsoffire:Placebo:1.21.1-9.9.4") { transitive = false }
+    localRuntime("dev.shadowsoffire:ApothicAttributes:1.21.1-2.11.0") { transitive = false }
 
-    implementation "curse.maven:malum-484064:7307339"
-    compileOnly "curse.maven:lodestone-616457:7264731"
-    localRuntime "curse.maven:lodestone-616457:7264731"
-
-    // Thaumaturge's own required deps, needed only to boot the dev client.
     localRuntime "maven.modrinth:lithostitched:1.8.1-neoforge-21.1"
     localRuntime "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1"
 
-    // Enigmatic Legacy Plus' required deps.
-    localRuntime "maven.modrinth:patchouli:1.21.1-93-neoforge"
+    localRuntime("vazkii.patchouli:Patchouli:1.21.1-93-NEOFORGE") { transitive = false }
     localRuntime "com.illusivesoulworks.caelus:caelus-neoforge:7.0.1+1.21.1"
 
     // Dev only: thaumaturge (+ some other mods?) cause experimental settings screen to show up, don't want that
-    localRuntime "curse.maven:yeetusexperimentus-635427:5444189"
+    localRuntime "maven.modrinth:yeetus-experimentus:87.0.0"
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
