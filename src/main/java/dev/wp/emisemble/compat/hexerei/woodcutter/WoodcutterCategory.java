@@ -32,6 +32,7 @@ public final class WoodcutterCategory {
         int fromData = EmiRecipes.addAll(registry, WoodcutterRecipe.Type.INSTANCE,
                 holder -> new WoodcutterEmiRecipe(CATEGORY, holder));
         int generated = addGenerated(registry);
+        WoodcutterHandler.register(registry);
 
         Emisemble.LOGGER.info("{}: {} woodcutter recipes registered ({} generated)",
                 NAMESPACE, fromData + generated, generated);

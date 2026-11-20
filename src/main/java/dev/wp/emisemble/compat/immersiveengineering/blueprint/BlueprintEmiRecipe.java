@@ -27,9 +27,11 @@ public final class BlueprintEmiRecipe extends BasicEmiRecipe {
 
     private final EmiStack blueprint;
     private final EmiStack output;
+    private final BlueprintCraftingRecipe host;
 
     public BlueprintEmiRecipe(EmiRecipeCategory category, ResourceLocation id, BlueprintCraftingRecipe recipe) {
         super(category, id, BlueprintCategory.WIDTH, BlueprintCategory.HEIGHT);
+        this.host = recipe;
         this.blueprint = EmiStack.of(BlueprintCraftingRecipe.getTypedBlueprint(recipe.blueprintCategory));
         this.output = EmiStack.of(recipe.output.get());
 
@@ -40,6 +42,11 @@ public final class BlueprintEmiRecipe extends BasicEmiRecipe {
         if (!this.output.isEmpty()) {
             outputs.add(this.output);
         }
+    }
+
+    /** IE keeps blueprint recipes in its own cache, so the page id is synthetic and the recipe comes from the page. */
+    public BlueprintCraftingRecipe host() {
+        return host;
     }
 
     @Override

@@ -21,6 +21,7 @@ import dev.wp.emisemble.compat.immersiveengineering.cloche.ClocheCategory;
 import dev.wp.emisemble.compat.immersiveengineering.mixer.MixerCategory;
 import dev.wp.emisemble.compat.immersiveengineering.refinery.RefineryCategory;
 import dev.wp.emisemble.compat.immersiveengineering.transfer.CraftingTableHandler;
+import dev.wp.emisemble.compat.immersiveengineering.transfer.WorkbenchHandler;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.PotionContents;
@@ -49,7 +50,7 @@ public final class ImmersiveEngineeringCompat {
                 + RefineryCategory.register(registry)
                 + BottlingCategory.register(registry)
                 + ClocheCategory.register(registry);
-        int handlers = CraftingTableHandler.register(registry);
+        int handlers = CraftingTableHandler.register(registry) + WorkbenchHandler.register(registry);
         Emisemble.LOGGER.info("immersiveengineering: {} recipes registered, {} transfer handlers", added, handlers);
     }
 
