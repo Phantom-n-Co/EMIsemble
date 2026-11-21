@@ -33,9 +33,9 @@ final class FallingAnvilShardPage extends BasicEmiRecipe {
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-        RecipeSlots.add(widgets, FallingAnvilCategory.ANVILS, 0, 0);
-        RecipeSlots.add(widgets, book, 0, 18);
-        RecipeSlots.add(widgets, disenchanting, 0, 36);
+        RecipeSlots.addFramed(widgets, FallingAnvilCategory.ANVILS, 0, 0);
+        RecipeSlots.addFramed(widgets, book, 0, 18);
+        RecipeSlots.addFramed(widgets, disenchanting, 0, 36);
         RecipeSlots.add(widgets, shard, 50, 18).recipeContext(this);
     }
 }
