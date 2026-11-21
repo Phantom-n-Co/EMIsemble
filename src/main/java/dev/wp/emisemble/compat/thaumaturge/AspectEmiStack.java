@@ -1,16 +1,22 @@
 package dev.wp.emisemble.compat.thaumaturge;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectKnowledgeAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.client.render.aspect.AspectTagRenderer;
 import dev.emi.emi.api.render.EmiTooltipComponents;
+import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
+import dev.emi.emi.api.stack.serializer.EmiIngredientSerializer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -116,5 +122,44 @@ public final class AspectEmiStack extends EmiStack {
     @Override
     public Component getName() {
         return AspectComponents.name(aspect);
+    }
+
+    /** Favorites are saved as JSON and read back through this, so a stack type without one cannot be favorited. */
+    public static final class Serializer implements EmiIngredientSerializer<AspectEmiStack> {
+        private static final String TYPE = "emisemble:aspect";
+
+        @Override
+        public String getType() {
+            return TYPE;
+        }
+
+        @Override
+        public JsonElement serialize(AspectEmiStack stack) {
+            JsonObject json = new JsonObject();
+            json.addProperty("type", TYPE);
+            json.addProperty("aspect", stack.getId().toString());
+            json.addProperty("amount", stack.getAmount());
+            return json;
+        }
+
+        // Saved favorites load during an EMI reload, which only runs with a level, so the registry is reachable.
+        @Override
+        public EmiIngredient deserialize(JsonElement element) {
+            if (!element.isJsonObject()) {
+                return EmiStack.EMPTY;
+            }
+            JsonObject json = element.getAsJsonObject();
+            ResourceLocation id = json.has("aspect") ? ResourceLocation.tryParse(json.get("aspect").getAsString()) : null;
+            ClientLevel level = Minecraft.getInstance().level;
+            if (id == null || level == null) {
+                return EmiStack.EMPTY;
+            }
+            Registry<IAspect> aspects = level.registryAccess().registry(IAspect.REGISTRY_KEY).orElse(null);
+            Holder.Reference<IAspect> holder = aspects == null ? null : aspects.getHolder(id).orElse(null);
+            if (holder == null) {
+                return EmiStack.EMPTY;
+            }
+            return new AspectEmiStack(holder, json.has("amount") ? json.get("amount").getAsLong() : 1);
+        }
     }
 }
