@@ -14,6 +14,7 @@ import dev.emi.emi.api.render.EmiRenderable;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.compat.thaumaturge.AspectEmiStack;
+import dev.wp.emisemble.porting.EmiVisibility;
 import dev.wp.emisemble.porting.TranslatedCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
@@ -71,6 +72,8 @@ public final class AspectPages {
         EmiRecipeCategory category = new TranslatedCategory(COMPOSITION, compositionIcon(aspects), COMPOSITION_TITLE);
         registry.addCategory(category);
         registry.addWorkstation(category, EmiStack.of(TTItems.THAUMONOMICON.get()));
+        EmiVisibility.hideRecipes("thaumaturge", recipe ->
+                recipe instanceof AspectCompositionEmiRecipe page && !page.revealed());
 
         int added = 0;
         for (Holder.Reference<IAspect> result : aspects.holders().toList()) {

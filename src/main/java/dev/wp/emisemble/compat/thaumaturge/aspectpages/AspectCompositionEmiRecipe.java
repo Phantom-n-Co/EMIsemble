@@ -1,6 +1,7 @@
 package dev.wp.emisemble.compat.thaumaturge.aspectpages;
 
 import com.leclowndu93150.thaumaturge.api.aspect.AspectComponents;
+import com.leclowndu93150.thaumaturge.api.aspect.AspectKnowledgeAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import dev.emi.emi.api.recipe.BasicEmiRecipe;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
@@ -42,6 +43,11 @@ final class AspectCompositionEmiRecipe extends BasicEmiRecipe {
         this.inputs.add(new AspectEmiStack(left, 1));
         this.inputs.add(new AspectEmiStack(right, 1));
         this.outputs.add(new AspectEmiStack(result, 1));
+    }
+
+    /** The host shows a composition once its aspect is deducible, not only once it is known. */
+    boolean revealed() {
+        return AspectKnowledgeAccess.of(result).isCompositionRevealed();
     }
 
     @Override
