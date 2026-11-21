@@ -73,6 +73,19 @@ public final class AspectEmiStack extends EmiStack {
         }
     }
 
+    /** True for another provider's stack for an aspect: EMI's JEI bridge wraps the host's aspect ingredient itself. */
+    public static boolean isForeignAspect(EmiStack stack) {
+        if (stack instanceof AspectEmiStack) {
+            return false;
+        }
+        try {
+            return stack.getKey() instanceof Holder<?> holder
+                    && holder.unwrapKey().map(key -> key.isFor(IAspect.REGISTRY_KEY)).orElse(false);
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
     @Override
     public List<Component> getTooltipText() {
         int colour = aspect.value().color() | 0xFF000000;
