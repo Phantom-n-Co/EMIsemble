@@ -5,6 +5,8 @@ import dev.emi.emi.api.stack.EmiStack;
 import dev.shadowsoffire.apotheosis.socket.gem.Gem;
 import dev.shadowsoffire.apotheosis.socket.gem.GemRegistry;
 import dev.shadowsoffire.apotheosis.socket.gem.Purity;
+import dev.wp.emisemble.porting.CyclingIngredient;
+import dev.wp.emisemble.porting.IngredientAmounts;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 import java.util.ArrayList;
@@ -55,19 +57,33 @@ public final class GemCuttingIngredients {
                 .toList();
     }
 
+    /**
+     * The material sockets cycle, and this recipe's options carry different counts (a purity upgrade's right socket is
+     * 27 timeworn fabric or 9 crystal shards or 3 arcane sands or 1 pearl), so they cannot share one amount.
+     */
     public static EmiIngredient sized(List<SizedIngredient> ingredients) {
         if (ingredients == null || ingredients.isEmpty()) {
             return EmiStack.EMPTY;
         }
         List<EmiIngredient> options = new ArrayList<>();
-        int amount = 1;
+        long amount = -1;
         for (SizedIngredient sized : ingredients) {
             if (sized.ingredient().isEmpty()) {
                 continue;
             }
-            amount = Math.max(amount, sized.count());
-            options.add(EmiIngredient.of(sized.ingredient(), sized.count()));
+            if (amount < 0) {
+                amount = sized.count();
+            }
+            options.add(IngredientAmounts.of(sized));
         }
-        return options.isEmpty() ? EmiStack.EMPTY : EmiIngredient.of(options, amount);
+        if (options.isEmpty()) {
+            return EmiStack.EMPTY;
+        }
+        if (options.size() == 1) {
+            return options.getFirst();
+        }
+        long shared = amount;
+        boolean uniform = options.stream().allMatch(option -> option.getAmount() == shared);
+        return uniform ? EmiIngredient.of(options, shared) : new CyclingIngredient(options);
     }
 }
