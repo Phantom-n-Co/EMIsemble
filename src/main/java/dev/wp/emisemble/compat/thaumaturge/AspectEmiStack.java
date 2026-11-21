@@ -8,6 +8,7 @@ import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
@@ -74,14 +75,24 @@ public final class AspectEmiStack extends EmiStack {
 
     @Override
     public List<Component> getTooltipText() {
+        int colour = aspect.value().color() | 0xFF000000;
         if (!AspectKnowledgeAccess.isKnown(aspect)) {
-            int colour = aspect.value().color() | 0xFF000000;
             return List.of(Component.translatable("tooltip.thaumaturge.aspect.unknown")
                     .withStyle(Style.EMPTY.withColor(colour)));
         }
         return List.of(
-                AspectComponents.name(aspect),
+                AspectComponents.name(aspect).withStyle(style -> style.withColor(colour)),
                 AspectComponents.description(aspect).withStyle(ChatFormatting.GRAY));
+    }
+
+    // Only getTooltip reaches a hovered slot; getTooltipText feeds search and the query tooltip.
+    @Override
+    public List<ClientTooltipComponent> getTooltip() {
+        List<ClientTooltipComponent> tooltip = super.getTooltip();
+        for (Component line : getTooltipText()) {
+            tooltip.add(ClientTooltipComponent.create(line.getVisualOrderText()));
+        }
+        return tooltip;
     }
 
     @Override
