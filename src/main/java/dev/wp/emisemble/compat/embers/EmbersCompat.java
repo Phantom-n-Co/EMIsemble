@@ -189,7 +189,10 @@ public final class EmbersCompat {
             try {
                 return (List<IDawnstoneAnvilRecipe>) (List<?>) split.getVisualRecipes();
             } catch (Throwable t) {
-                Emisemble.LOGGER.warn("embers: could not split {} into its variants", holder.id(), t);
+                // The host generates the whole list or nothing, so an empty answer is the honest one here: the
+                // placeholder it leaves behind is a page with no slots on it.
+                Emisemble.LOGGER.warn("embers: {} has no visual recipes; the host's generator failed", holder.id(), t);
+                return List.of();
             }
         }
         return List.of(holder.value());
