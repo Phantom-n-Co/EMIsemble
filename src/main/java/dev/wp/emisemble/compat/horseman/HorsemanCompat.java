@@ -4,7 +4,6 @@ import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiCraftingRecipe;
 import dev.emi.emi.api.recipe.EmiInfoRecipe;
-import dev.emi.emi.api.stack.Comparison;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.wp.emisemble.Emisemble;
@@ -14,7 +13,6 @@ import io.github.mortuusars.horseman.Horseman;
 import io.github.mortuusars.horseman.world.item.crafting.recipe.ComponentTransferringRecipe;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -43,9 +41,6 @@ public final class HorsemanCompat {
     }
 
     private static void instruments(EmiRegistry registry, Item horn) {
-        // JEI keys the horn on the instrument alone, and only for the index: recipe matching treats every horn alike.
-        registry.setDefaultComparison(horn, Comparison.compareData(stack -> stack.get(DataComponents.INSTRUMENT)));
-
         HolderSet<Instrument> goatHorns = BuiltInRegistries.INSTRUMENT.getTag(InstrumentTags.GOAT_HORNS).orElse(null);
         if (goatHorns == null) {
             return;
