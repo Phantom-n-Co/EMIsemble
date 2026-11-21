@@ -9,6 +9,7 @@ import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.compat.thaumaturge.AspectEmiStack;
+import dev.wp.emisemble.porting.EmiRecipes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -30,7 +31,7 @@ public final class InfoPages {
 
     private static void deconstructionTable(EmiRegistry registry) {
         try {
-            registry.addRecipe(new EmiInfoRecipe(
+            EmiRecipes.add(registry, new EmiInfoRecipe(
                     List.<EmiIngredient>of(EmiStack.of(TTItems.DECONSTRUCTION_TABLE.get())),
                     List.of(Component.translatable(DECONSTRUCTION_KEY)),
                     ResourceLocation.fromNamespaceAndPath("thaumaturge", "/deconstruction_table_info")));
@@ -60,11 +61,12 @@ public final class InfoPages {
                 continue;
             }
             try {
-                registry.addRecipe(new EmiInfoRecipe(
+                if (EmiRecipes.add(registry, new EmiInfoRecipe(
                         List.<EmiIngredient>of(new AspectEmiStack(aspect, 1)),
                         List.of(AspectComponents.description(aspect)),
-                        aspectInfoId(key)));
-                added++;
+                        aspectInfoId(key)))) {
+                    added++;
+                }
             } catch (Throwable t) {
                 Emisemble.LOGGER.warn("Skipping the aspect info page for {}", key, t);
             }

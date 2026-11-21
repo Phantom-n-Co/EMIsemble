@@ -18,6 +18,7 @@ import dev.wp.emisemble.compat.cognition.infecting.InfectingCategory;
 import dev.wp.emisemble.compat.cognition.metamorphosis.MetamorphosisCategory;
 import dev.wp.emisemble.compat.cognition.metamorphosis.MetamorphosisEmiRecipe;
 import dev.wp.emisemble.porting.AlphaTextures;
+import dev.wp.emisemble.porting.EmiRecipes;
 import dev.wp.emisemble.porting.TransferSlots;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -76,7 +77,7 @@ public final class CognitionCompat {
 
     private static void forgottenDust(EmiRegistry registry) {
         try {
-            registry.addRecipe(new EmiInfoRecipe(
+            EmiRecipes.add(registry, new EmiInfoRecipe(
                     List.<EmiIngredient>of(EmiStack.of(RegisterItems.FORGOTTEN_DUST.get())),
                     List.of(Component.translatable("jei.cognition.description.forgotten_dust")),
                     ResourceLocation.fromNamespaceAndPath("cognition", "/forgotten_dust_info")));
