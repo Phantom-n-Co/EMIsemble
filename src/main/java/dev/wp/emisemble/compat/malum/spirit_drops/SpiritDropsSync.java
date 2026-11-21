@@ -3,11 +3,11 @@ package dev.wp.emisemble.compat.malum.spirit_drops;
 import com.sammy.malum.core.listeners.SpiritDataReloadListener;
 import com.sammy.malum.core.systems.spirit.EntitySpiritDropData;
 import dev.wp.emisemble.Emisemble;
+import dev.wp.emisemble.network.Payloads;
 import dev.wp.emisemble.network.SpiritDropsPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ public final class SpiritDropsSync {
         if (payload.entries().isEmpty()) {
             return;
         }
-        event.getRelevantPlayers().forEach(player -> PacketDistributor.sendToPlayer(player, payload));
+        Payloads.sync(event, payload);
     }
 
     private static SpiritDropsPayload payload() {

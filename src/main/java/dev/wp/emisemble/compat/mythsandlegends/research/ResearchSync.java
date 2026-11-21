@@ -13,6 +13,7 @@ import dev.emi.emi.api.EmiApi;
 import dev.emi.emi.api.recipe.EmiRecipeManager;
 import dev.emi.emi.runtime.EmiReloadManager;
 import dev.wp.emisemble.Emisemble;
+import dev.wp.emisemble.network.Payloads;
 import dev.wp.emisemble.network.ResearchPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
@@ -25,7 +26,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public final class ResearchSync {
         if (payload.entries().isEmpty()) {
             return;
         }
-        event.getRelevantPlayers().forEach(player -> PacketDistributor.sendToPlayer(player, payload));
+        Payloads.sync(event, payload);
     }
 
     private static ResearchPayload payload(RegistryAccess access) {
