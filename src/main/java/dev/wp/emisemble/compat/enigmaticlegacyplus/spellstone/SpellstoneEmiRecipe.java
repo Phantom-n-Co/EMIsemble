@@ -106,6 +106,18 @@ public final class SpellstoneEmiRecipe extends BasicEmiRecipe {
         return new ListEmiIngredient(stacks, 1L);
     }
 
+    int ringCount() {
+        return ring.size();
+    }
+
+    boolean hasDebris() {
+        return !debris.isEmpty();
+    }
+
+    boolean fragmentation() {
+        return fragmentation;
+    }
+
     @Override
     public void addWidgets(WidgetHolder widgets) {
         SpellstonePageArt.page(widgets);

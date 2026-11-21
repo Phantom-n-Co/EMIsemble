@@ -10,6 +10,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.wp.emisemble.Emisemble;
+import dev.wp.emisemble.compat.rechiseled.transfer.ChiselHandler;
 import dev.wp.emisemble.porting.EmiRecipes;
 import dev.wp.emisemble.porting.TranslatedCategory;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -47,6 +48,7 @@ public final class RechiseledCompat {
             }
         }
 
+        ChiselHandler.register(registry);
         Emisemble.LOGGER.info("rechiseled: {} chiseling recipes registered", added);
         return added;
     }

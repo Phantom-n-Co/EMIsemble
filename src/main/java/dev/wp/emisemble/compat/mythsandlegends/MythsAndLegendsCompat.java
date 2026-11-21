@@ -4,6 +4,7 @@ import dev.emi.emi.api.EmiRegistry;
 import dev.wp.emisemble.Emisemble;
 import dev.wp.emisemble.compat.mythsandlegends.research.ResearchCategory;
 import dev.wp.emisemble.compat.mythsandlegends.stone_sanctum.StoneSanctumCategory;
+import dev.wp.emisemble.compat.mythsandlegends.stone_sanctum.StoneSanctumHandler;
 import net.minecraft.resources.ResourceLocation;
 
 /** The two categories the host's JEI plugin has: the research pages and the one hand-built Stone Sanctum ritual. */
@@ -24,6 +25,7 @@ public final class MythsAndLegendsCompat {
         int added = 0;
         added += ResearchCategory.register(registry);
         added += StoneSanctumCategory.register(registry);
+        StoneSanctumHandler.register(registry);
         Emisemble.LOGGER.info("mythsandlegends: {} recipes registered", added);
     }
 }

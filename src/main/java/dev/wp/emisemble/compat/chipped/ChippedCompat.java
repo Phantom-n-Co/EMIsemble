@@ -5,6 +5,7 @@ import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import dev.wp.emisemble.Emisemble;
+import dev.wp.emisemble.compat.chipped.transfer.WorkbenchHandler;
 import dev.wp.emisemble.porting.EmiRecipes;
 import dev.wp.emisemble.porting.TranslatedCategory;
 import earth.terrarium.chipped.common.recipes.ChippedRecipe;
@@ -53,6 +54,7 @@ public final class ChippedCompat {
         }
 
         Emisemble.LOGGER.info("chipped: {} workbench recipes registered", added);
+        WorkbenchHandler.register(registry);
         return added;
     }
 

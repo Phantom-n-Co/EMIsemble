@@ -20,6 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.crafting.RecipeType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** {@code enigmaticlegacyplus:spellstone_crafting}. */
@@ -68,6 +69,11 @@ public final class SpellstoneCompat {
 
     /** JEI's {@code addRecipeTransferHandler(SpellstoneTableMenu, …, 0, 10, 11, 36)} in EMI's shape. */
     private static final class Handler implements StandardRecipeHandler<SpellstoneTableMenu> {
+        private static final int DEBRIS = 0;
+        private static final int SPELLSTONE = 1;
+        private static final int CORE = 2;
+        private static final int RING_START = 3;
+        private static final int RESULT = 10;
         private static final int CRAFT_SLOTS = 10;
         private static final int INVENTORY_START = 11;
         private static final int INVENTORY_SLOTS = 36;
@@ -83,6 +89,29 @@ public final class SpellstoneCompat {
         @Override
         public List<Slot> getCraftingSlots(SpellstoneTableMenu menu) {
             return menu.slots.subList(0, CRAFT_SLOTS);
+        }
+
+        @Override
+        public List<Slot> getCraftingSlots(EmiRecipe recipe, SpellstoneTableMenu menu) {
+            if (!(recipe instanceof SpellstoneEmiRecipe page)) {
+                return getCraftingSlots(menu);
+            }
+            // EMI puts input i in craftingSlots[i] and the page orders its inputs as ring, debris, then core or
+            // spellstones, which is neither the menu's order nor even the same length on every page.
+            List<Slot> slots = new ArrayList<>(page.ringCount() + 2);
+            for (int i = 0; i < page.ringCount(); i++) {
+                slots.add(menu.slots.get(RING_START + i));
+            }
+            if (page.hasDebris()) {
+                slots.add(menu.slots.get(DEBRIS));
+            }
+            slots.add(menu.slots.get(page.fragmentation() ? SPELLSTONE : CORE));
+            return slots;
+        }
+
+        @Override
+        public Slot getOutputSlot(SpellstoneTableMenu menu) {
+            return menu.slots.get(RESULT);
         }
 
         @Override
