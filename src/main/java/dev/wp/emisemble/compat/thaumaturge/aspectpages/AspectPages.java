@@ -76,6 +76,7 @@ public final class AspectPages {
                 recipe instanceof AspectCompositionEmiRecipe page && !page.revealed());
 
         int added = 0;
+        AspectCompositionEmiRecipe.Layout layout = AspectCompositionEmiRecipe.Layout.forWidestName(widestName(aspects));
         for (Holder.Reference<IAspect> result : aspects.holders().toList()) {
             List<Holder<IAspect>> parts = result.value().components();
             if (parts.size() != 2) {
@@ -83,13 +84,21 @@ public final class AspectPages {
             }
             try {
                 registry.addRecipe(new AspectCompositionEmiRecipe(category, compositionId(result), parts.get(0),
-                        parts.get(1), result));
+                        parts.get(1), result, layout));
                 added++;
             } catch (Throwable t) {
                 Emisemble.LOGGER.warn("Skipping aspect composition {}", pathOf(result), t);
             }
         }
         return added;
+    }
+
+    private static int widestName(Registry<IAspect> aspects) {
+        int widest = 0;
+        for (Holder.Reference<IAspect> aspect : aspects.holders().toList()) {
+            widest = Math.max(widest, AspectCompositionEmiRecipe.halfWidth(aspect));
+        }
+        return widest;
     }
 
     private static int addFromStacks(EmiRegistry registry, Registry<IAspect> aspects) {
