@@ -1,6 +1,7 @@
 package dev.wp.emisemble;
 
 import dev.wp.emisemble.compat.gateways.GatewaysSync;
+import dev.wp.emisemble.compat.immersiveengineering.transfer.WorkbenchCraftPayload;
 import dev.wp.emisemble.compat.malum.spirit_drops.SpiritDropsData;
 import dev.wp.emisemble.compat.malum.spirit_drops.SpiritDropsSync;
 import dev.wp.emisemble.compat.mythsandlegends.research.ResearchSync;
@@ -46,6 +47,8 @@ public final class Emisemble {
                 (payload, context) -> ResearchSync.accept(payload));
         registrar.playToClient(GatewaysPayload.TYPE, GatewaysPayload.STREAM_CODEC,
                 (payload, context) -> GatewaysSync.accept(payload));
+        registrar.playToServer(WorkbenchCraftPayload.TYPE, WorkbenchCraftPayload.STREAM_CODEC,
+                WorkbenchCraftPayload::handle);
     }
 
     /**

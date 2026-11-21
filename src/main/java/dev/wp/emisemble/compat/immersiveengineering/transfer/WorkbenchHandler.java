@@ -1,7 +1,6 @@
 package dev.wp.emisemble.compat.immersiveengineering.transfer;
 
 import blusunrize.immersiveengineering.api.crafting.BlueprintCraftingRecipe;
-import blusunrize.immersiveengineering.api.crafting.IngredientWithSize;
 import blusunrize.immersiveengineering.common.gui.IESlot;
 import blusunrize.immersiveengineering.common.gui.ModWorkbenchContainer;
 import blusunrize.immersiveengineering.common.register.IEMenuTypes;
@@ -16,10 +15,12 @@ import dev.wp.emisemble.compat.immersiveengineering.blueprint.BlueprintEmiRecipe
 import dev.wp.emisemble.porting.ClickSlots;
 import dev.wp.emisemble.porting.ClientTicks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.registration.NetworkRegistry;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,13 +32,18 @@ import java.util.List;
  */
 public final class WorkbenchHandler implements StandardRecipeHandler<ModWorkbenchContainer> {
     private static final int BLUEPRINT_SLOT = 0;
-    private static final int MAX_PAGES = 16;
+    // IE's ModWorkbenchContainer.OUTPUTS_PER_PAGE; the page buttons are button id 1 (back) and 2 (forward).
+    private static final int OUTPUTS_PER_PAGE = 9;
+    private static final int NEXT_PAGE = 2;
+    private static final int REBIND_TICKS = 40;
+    private static final int MAX_BATCHES = 64;
+    private static final WorkbenchHandler INSTANCE = new WorkbenchHandler();
 
     private WorkbenchHandler() {}
 
     public static int register(EmiRegistry registry) {
         try {
-            registry.addRecipeHandler(IEMenuTypes.MOD_WORKBENCH.getType(), new WorkbenchHandler());
+            registry.addRecipeHandler(IEMenuTypes.MOD_WORKBENCH.getType(), INSTANCE);
             return 1;
         } catch (Throwable t) {
             Emisemble.LOGGER.warn("immersiveengineering: could not register the workbench transfer handler", t);
@@ -68,64 +74,82 @@ public final class WorkbenchHandler implements StandardRecipeHandler<ModWorkbenc
 
     @Override
     public boolean canCraft(EmiRecipe recipe, EmiCraftContext<ModWorkbenchContainer> context) {
-        BlueprintCraftingRecipe host = host(recipe);
-        if (host == null) {
-            return false;
-        }
-        ModWorkbenchContainer menu = context.getScreenHandler();
-        if (plan(menu, host) != null) {
-            return true;
-        }
         ItemStack blueprint = blueprint(recipe);
-        return !blueprint.isEmpty() && !holds(menu, blueprint) && blueprintSlot(menu, blueprint) != null
-                && materials(menu, host);
-    }
-
-    @Override
-    public boolean craft(EmiRecipe recipe, EmiCraftContext<ModWorkbenchContainer> context) {
-        return attempt(recipe, context, true);
+        ModWorkbenchContainer menu = context.getScreenHandler();
+        boolean reachable = !blueprint.isEmpty()
+                && (holds(menu, blueprint) || blueprintSlot(menu, blueprint) != null);
+        return host(recipe) != null && reachable && context.getInventory().canCraft(recipe);
     }
 
     /**
      * The blueprint in slot 0 is what makes the six input slots exist, and inserting one rebinds the menu, so a fill
      * that has to place it finishes on a later tick when the new slots are there.
      */
-    private static boolean attempt(EmiRecipe recipe, EmiCraftContext<ModWorkbenchContainer> context, boolean mayDefer) {
+    @Override
+    public boolean craft(EmiRecipe recipe, EmiCraftContext<ModWorkbenchContainer> context) {
         Minecraft client = Minecraft.getInstance();
         ModWorkbenchContainer menu = context.getScreenHandler();
-        BlueprintCraftingRecipe host = host(recipe);
-        if (client.player == null || client.gameMode == null || host == null || !menu.getCarried().isEmpty()) {
+        if (client.player == null || client.gameMode == null || host(recipe) == null) {
             return false;
         }
         ItemStack blueprint = blueprint(recipe);
         if (!blueprint.isEmpty() && !holds(menu, blueprint)) {
             Slot source = blueprintSlot(menu, blueprint);
-            if (!mayDefer || source == null) {
+            if (source == null) {
                 return false;
             }
             ClickSlots.quickMove(menu, source);
-            ClientTicks.after(2, () -> {
-                if (Minecraft.getInstance().screen == context.getScreen()) {
-                    attempt(recipe, context, false);
-                }
-            });
+            awaitRebind(recipe, context, 0);
             return true;
         }
-        Plan plan = plan(menu, host);
-        if (plan == null) {
+        return fill(recipe, context);
+    }
+
+    /** EMI's filler prices the fill, so Craft All places what the sources pay for instead of one craft's worth. */
+    private boolean fill(EmiRecipe recipe, EmiCraftContext<ModWorkbenchContainer> context) {
+        if (!context.getScreenHandler().getCarried().isEmpty()) {
             return false;
         }
-        for (Move move : plan.moves()) {
-            if (move.count() <= 0) {
-                ClickSlots.move(menu, move.from(), move.to());
-            } else {
-                ClickSlots.moveCount(menu, move.from(), move.to(), move.count());
-            }
+        EmiCraftContext<ModWorkbenchContainer> stage = new EmiCraftContext<>(context.getScreen(),
+                context.getInventory(), context.getType(), EmiCraftContext.Destination.NONE, batches(context));
+        if (!StandardRecipeHandler.super.craft(recipe, stage)) {
+            return false;
         }
-        if (context.getDestination() == EmiCraftContext.Destination.NONE) {
+        return context.getDestination() == EmiCraftContext.Destination.NONE || take(recipe, context);
+    }
+
+    // The server owns the page the take is gated on; a station without this mod's channel gets the page walk below.
+    private static boolean take(EmiRecipe recipe, EmiCraftContext<ModWorkbenchContainer> context) {
+        ModWorkbenchContainer menu = context.getScreenHandler();
+        Slot output = output(menu, host(recipe));
+        if (output == null) {
+            return false;
+        }
+        ClientPacketListener connection = Minecraft.getInstance().getConnection();
+        if (connection != null && NetworkRegistry.hasChannel(connection, WorkbenchCraftPayload.TYPE.id())) {
+            PacketDistributor.sendToServer(new WorkbenchCraftPayload(menu.containerId, output.index,
+                    context.getDestination().ordinal(), batches(context)));
             return true;
         }
-        return take(client, menu, plan.output(), context.getDestination());
+        takeHere(context, output, context.getDestination());
+        return true;
+    }
+
+    private static int batches(EmiCraftContext<ModWorkbenchContainer> context) {
+        return Math.max(1, Math.min(context.getAmount(), MAX_BATCHES));
+    }
+
+    private static void awaitRebind(EmiRecipe recipe, EmiCraftContext<ModWorkbenchContainer> context, int waited) {
+        ClientTicks.after(1, () -> {
+            if (Minecraft.getInstance().screen != context.getScreen()) {
+                return;
+            }
+            if (holds(context.getScreenHandler(), blueprint(recipe))) {
+                INSTANCE.fill(recipe, context);
+            } else if (waited < REBIND_TICKS) {
+                awaitRebind(recipe, context, waited + 1);
+            }
+        });
     }
 
     private static ItemStack blueprint(EmiRecipe recipe) {
@@ -155,40 +179,49 @@ public final class WorkbenchHandler implements StandardRecipeHandler<ModWorkbenc
         return null;
     }
 
-    private static boolean materials(ModWorkbenchContainer menu, BlueprintCraftingRecipe host) {
-        List<Slot> slots = new ArrayList<>(inputs(menu));
-        slots.addAll(inventory(menu));
-        for (IngredientWithSize wanted : host.inputs) {
-            int available = 0;
-            for (Slot slot : slots) {
-                ItemStack stack = slot.getItem();
-                if (!stack.isEmpty() && wanted.test(stack)) {
-                    available += stack.getCount();
-                }
-            }
-            if (available < wanted.getCount()) {
-                return false;
-            }
+    /**
+     * IE only takes an output slot that is on the page the server shows, and the page is server state the client is
+     * never told about, so this walks to the recipe's page and steps forward if that guess was off.
+     */
+    private static void takeHere(EmiCraftContext<ModWorkbenchContainer> context, Slot output,
+                                 EmiCraftContext.Destination destination) {
+        Minecraft client = Minecraft.getInstance();
+        ModWorkbenchContainer menu = context.getScreenHandler();
+        // IE decides the page from the recipe's own index, while the menu list is offset by the blueprint slot.
+        for (int i = 0; i < output.getSlotIndex() / OUTPUTS_PER_PAGE; i++) {
+            client.gameMode.handleInventoryButtonClick(menu.containerId, NEXT_PAGE);
         }
-        return true;
+        int pages = outputs(menu) / OUTPUTS_PER_PAGE + 1;
+        takeAndCheck(client, context, output.index, destination, Math.max(1, pages));
     }
 
-    private static boolean take(Minecraft client, ModWorkbenchContainer menu, Slot slot,
-                                EmiCraftContext.Destination destination) {
-        IESlot.BlueprintOutput output = (IESlot.BlueprintOutput) slot;
-        // IE shows one page of outputs at a time and only those can be taken; the page button is the only way over.
-        for (int i = 0; i < MAX_PAGES && !output.isOnPage(); i++) {
-            client.gameMode.handleInventoryButtonClick(menu.containerId, 2);
-        }
-        if (!output.isOnPage()) {
-            return false;
-        }
+    private static void takeAndCheck(Minecraft client, EmiCraftContext<ModWorkbenchContainer> context, int slot,
+                                     EmiCraftContext.Destination destination, int triesLeft) {
+        ModWorkbenchContainer menu = context.getScreenHandler();
+        Slot output = menu.slots.get(slot);
         if (destination == EmiCraftContext.Destination.CURSOR) {
-            ClickSlots.pickup(menu, slot);
+            ClickSlots.pickup(menu, output);
         } else {
-            ClickSlots.quickMove(menu, slot);
+            ClickSlots.quickMove(menu, output);
         }
-        return true;
+        ClientTicks.after(2, () -> {
+            if (Minecraft.getInstance().screen != context.getScreen() || triesLeft <= 1
+                    || output.getItem().isEmpty()) {
+                return;
+            }
+            client.gameMode.handleInventoryButtonClick(context.getScreenHandler().containerId, NEXT_PAGE);
+            takeAndCheck(client, context, slot, destination, triesLeft - 1);
+        });
+    }
+
+    private static int outputs(ModWorkbenchContainer menu) {
+        int outputs = 0;
+        for (Slot slot : menu.slots) {
+            if (slot instanceof IESlot.BlueprintOutput) {
+                outputs++;
+            }
+        }
+        return outputs;
     }
 
     private static BlueprintCraftingRecipe host(EmiRecipe recipe) {
@@ -227,119 +260,5 @@ public final class WorkbenchHandler implements StandardRecipeHandler<ModWorkbenc
             }
         }
         return null;
-    }
-
-    private record Move(Slot from, Slot to, int count) {}
-
-    private record Plan(List<Move> moves, Slot output) {}
-
-    /** What has to move where, worked out on copies so a fill that cannot finish moves nothing. */
-    private static Plan plan(ModWorkbenchContainer menu, BlueprintCraftingRecipe host) {
-        List<Slot> inputs = inputs(menu);
-        Slot output = output(menu, host);
-        if (output == null || inputs.isEmpty() || host.inputs.size() > inputs.size()) {
-            return null;
-        }
-        List<Slot> inventory = inventory(menu);
-        List<ItemStack> state = new ArrayList<>(inputs.size());
-        for (Slot slot : inputs) {
-            state.add(slot.getItem().copy());
-        }
-        List<ItemStack> held = new ArrayList<>(inventory.size());
-        for (Slot slot : inventory) {
-            held.add(slot.getItem().copy());
-        }
-        List<Move> moves = new ArrayList<>();
-
-        for (IngredientWithSize wanted : host.inputs) {
-            int missing = wanted.getCount() - count(state, wanted);
-            while (missing > 0) {
-                int source = firstMatch(held, wanted);
-                int target = targetSlot(state, wanted);
-                if (target < 0 && !evict(state, held, moves, inputs, inventory, wanted)) {
-                    return null;
-                }
-                if (source < 0) {
-                    return null;
-                }
-                target = targetSlot(state, wanted);
-                if (target < 0) {
-                    return null;
-                }
-                ItemStack sourceStack = held.get(source);
-                ItemStack targetStack = state.get(target);
-                int space = inputs.get(target).getMaxStackSize() - targetStack.getCount();
-                int moved = Math.min(Math.min(missing, sourceStack.getCount()), space);
-                if (moved <= 0) {
-                    return null;
-                }
-                state.set(target, targetStack.isEmpty()
-                        ? sourceStack.copyWithCount(moved) : targetStack.copyWithCount(targetStack.getCount() + moved));
-                held.set(source, sourceStack.getCount() == moved
-                        ? ItemStack.EMPTY : sourceStack.copyWithCount(sourceStack.getCount() - moved));
-                moves.add(new Move(inventory.get(source), inputs.get(target), moved));
-                missing -= moved;
-            }
-        }
-        return new Plan(List.copyOf(moves), output);
-    }
-
-    private static int count(List<ItemStack> stacks, IngredientWithSize wanted) {
-        int total = 0;
-        for (ItemStack stack : stacks) {
-            if (!stack.isEmpty() && wanted.test(stack)) {
-                total += stack.getCount();
-            }
-        }
-        return total;
-    }
-
-    private static int firstMatch(List<ItemStack> stacks, IngredientWithSize wanted) {
-        for (int i = 0; i < stacks.size(); i++) {
-            ItemStack stack = stacks.get(i);
-            if (!stack.isEmpty() && wanted.test(stack)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    /** A slot the wanted items can go into: one holding them with room, else an empty one. */
-    private static int targetSlot(List<ItemStack> state, IngredientWithSize wanted) {
-        int empty = -1;
-        for (int i = 0; i < state.size(); i++) {
-            ItemStack stack = state.get(i);
-            if (stack.isEmpty()) {
-                if (empty < 0) {
-                    empty = i;
-                }
-            } else if (wanted.test(stack) && stack.getCount() < stack.getMaxStackSize()) {
-                return i;
-            }
-        }
-        return empty;
-    }
-
-    /** Frees the first input slot the recipe cannot use, so a workbench full of other materials can still be filled. */
-    private static boolean evict(List<ItemStack> state, List<ItemStack> held, List<Move> moves, List<Slot> inputs,
-                                 List<Slot> inventory, IngredientWithSize wanted) {
-        for (int i = 0; i < state.size(); i++) {
-            ItemStack stack = state.get(i);
-            if (stack.isEmpty() || wanted.test(stack)) {
-                continue;
-            }
-            for (int j = 0; j < held.size(); j++) {
-                ItemStack into = held.get(j);
-                if (into.isEmpty() || ItemStack.isSameItemSameComponents(into, stack)
-                        && into.getCount() + stack.getCount() <= inventory.get(j).getMaxStackSize()) {
-                    moves.add(new Move(inputs.get(i), inventory.get(j), 0));
-                    held.set(j, into.isEmpty()
-                            ? stack.copy() : into.copyWithCount(into.getCount() + stack.getCount()));
-                    state.set(i, ItemStack.EMPTY);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }
