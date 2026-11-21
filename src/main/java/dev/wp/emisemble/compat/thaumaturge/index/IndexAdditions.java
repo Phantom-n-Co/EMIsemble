@@ -52,6 +52,8 @@ public final class IndexAdditions {
                 .sorted(Comparator.comparing(holder -> !holder.value().isPrimal()))
                 .toList();
 
+        registry.removeEmiStacks(AspectEmiStack::isForeignAspect);
+
         int added = 0;
         for (Holder.Reference<IAspect> aspect : sorted) {
             registry.addEmiStack(new AspectEmiStack(aspect, 1));
