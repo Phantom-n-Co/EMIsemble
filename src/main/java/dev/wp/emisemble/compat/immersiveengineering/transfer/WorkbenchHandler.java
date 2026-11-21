@@ -31,7 +31,10 @@ import java.util.List;
  */
 public final class WorkbenchHandler implements StandardRecipeHandler<ModWorkbenchContainer> {
     private static final int BLUEPRINT_SLOT = 0;
-    private static final int MAX_PAGES = 16;
+    // IE's ModWorkbenchContainer.OUTPUTS_PER_PAGE; the page buttons are button id 1 (back) and 2 (forward).
+    private static final int OUTPUTS_PER_PAGE = 9;
+    private static final int NEXT_PAGE = 2;
+    private static final int REBIND_TICKS = 40;
 
     private WorkbenchHandler() {}
 
@@ -104,11 +107,7 @@ public final class WorkbenchHandler implements StandardRecipeHandler<ModWorkbenc
                 return false;
             }
             ClickSlots.quickMove(menu, source);
-            ClientTicks.after(2, () -> {
-                if (Minecraft.getInstance().screen == context.getScreen()) {
-                    attempt(recipe, context, false);
-                }
-            });
+            awaitRebind(recipe, context, 0);
             return true;
         }
         Plan plan = plan(menu, host);
@@ -125,7 +124,25 @@ public final class WorkbenchHandler implements StandardRecipeHandler<ModWorkbenc
         if (context.getDestination() == EmiCraftContext.Destination.NONE) {
             return true;
         }
-        return take(client, menu, plan.output(), context.getDestination());
+        take(client, context, plan.output(), context.getDestination());
+        return true;
+    }
+
+    /**
+     * The blueprint lands on the server, which rebinds the menu and sends the new slots back. On a server that is a
+     * round trip rather than two ticks of local time, so this waits for slot 0 to hold it instead of guessing.
+     */
+    private static void awaitRebind(EmiRecipe recipe, EmiCraftContext<ModWorkbenchContainer> context, int waited) {
+        ClientTicks.after(1, () -> {
+            if (Minecraft.getInstance().screen != context.getScreen()) {
+                return;
+            }
+            if (holds(context.getScreenHandler(), blueprint(recipe))) {
+                attempt(recipe, context, false);
+            } else if (waited < REBIND_TICKS) {
+                awaitRebind(recipe, context, waited + 1);
+            }
+        });
     }
 
     private static ItemStack blueprint(EmiRecipe recipe) {
@@ -173,22 +190,48 @@ public final class WorkbenchHandler implements StandardRecipeHandler<ModWorkbenc
         return true;
     }
 
-    private static boolean take(Minecraft client, ModWorkbenchContainer menu, Slot slot,
-                                EmiCraftContext.Destination destination) {
-        IESlot.BlueprintOutput output = (IESlot.BlueprintOutput) slot;
-        // IE shows one page of outputs at a time and only those can be taken; the page button is the only way over.
-        for (int i = 0; i < MAX_PAGES && !output.isOnPage(); i++) {
-            client.gameMode.handleInventoryButtonClick(menu.containerId, 2);
+    /**
+     * IE only takes an output slot that is on the page the server shows, and the page is server state the client is
+     * never told about, so this walks to the recipe's page and steps forward if that guess was off.
+     */
+    private static void take(Minecraft client, EmiCraftContext<ModWorkbenchContainer> context, Slot output,
+                             EmiCraftContext.Destination destination) {
+        ModWorkbenchContainer menu = context.getScreenHandler();
+        // IE decides the page from the recipe's own index, while the menu list is offset by the blueprint slot.
+        for (int i = 0; i < output.getSlotIndex() / OUTPUTS_PER_PAGE; i++) {
+            client.gameMode.handleInventoryButtonClick(menu.containerId, NEXT_PAGE);
         }
-        if (!output.isOnPage()) {
-            return false;
-        }
+        int pages = outputs(menu) / OUTPUTS_PER_PAGE + 1;
+        takeAndCheck(client, context, output.index, destination, Math.max(1, pages));
+    }
+
+    private static void takeAndCheck(Minecraft client, EmiCraftContext<ModWorkbenchContainer> context, int slot,
+                                     EmiCraftContext.Destination destination, int triesLeft) {
+        ModWorkbenchContainer menu = context.getScreenHandler();
+        Slot output = menu.slots.get(slot);
         if (destination == EmiCraftContext.Destination.CURSOR) {
-            ClickSlots.pickup(menu, slot);
+            ClickSlots.pickup(menu, output);
         } else {
-            ClickSlots.quickMove(menu, slot);
+            ClickSlots.quickMove(menu, output);
         }
-        return true;
+        ClientTicks.after(2, () -> {
+            if (Minecraft.getInstance().screen != context.getScreen() || triesLeft <= 1
+                    || output.getItem().isEmpty()) {
+                return;
+            }
+            client.gameMode.handleInventoryButtonClick(context.getScreenHandler().containerId, NEXT_PAGE);
+            takeAndCheck(client, context, slot, destination, triesLeft - 1);
+        });
+    }
+
+    private static int outputs(ModWorkbenchContainer menu) {
+        int outputs = 0;
+        for (Slot slot : menu.slots) {
+            if (slot instanceof IESlot.BlueprintOutput) {
+                outputs++;
+            }
+        }
+        return outputs;
     }
 
     private static BlueprintCraftingRecipe host(EmiRecipe recipe) {
