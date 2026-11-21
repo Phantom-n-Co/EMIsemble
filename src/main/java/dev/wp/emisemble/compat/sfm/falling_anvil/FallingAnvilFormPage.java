@@ -28,9 +28,10 @@ final class FallingAnvilFormPage extends BasicEmiRecipe {
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-        RecipeSlots.add(widgets, FallingAnvilCategory.ANVILS, 0, 0);
-        RecipeSlots.add(widgets, form, 0, 18);
-        RecipeSlots.add(widgets, block, 0, 36);
+        // Same look as the printing press: the ingredients and the workstation carry EMI's slot frame, the result does not.
+        RecipeSlots.addFramed(widgets, FallingAnvilCategory.ANVILS, 0, 0);
+        RecipeSlots.addFramed(widgets, form, 0, 18);
+        RecipeSlots.addFramed(widgets, block, 0, 36);
         RecipeSlots.add(widgets, form, 50, 18).recipeContext(this);
     }
 }

@@ -49,11 +49,10 @@ final class FallingAnvilDisenchantPage extends BasicEmiRecipe {
 
     @Override
     public void addWidgets(WidgetHolder widgets) {
-        RecipeSlots.add(widgets, FallingAnvilCategory.ANVILS, 8, 0);
-        RecipeSlots.add(widgets, disenchanting, 8, 36);
-        RecipeSlots.add(widgets, blankBook, 18, 18);
-        // The page has no art of its own, so both cycling slots keep the host's bare look.
-        RecipeSlots.addGenerated(widgets, this::item, unique, 0, 18).drawBack(false);
+        RecipeSlots.addFramed(widgets, FallingAnvilCategory.ANVILS, 8, 0);
+        RecipeSlots.addFramed(widgets, disenchanting, 8, 36);
+        RecipeSlots.addFramed(widgets, blankBook, 18, 18);
+        RecipeSlots.addGenerated(widgets, this::item, unique, 0, 18);
         RecipeSlots.addGenerated(widgets, this::book, unique, 50, 18).drawBack(false).recipeContext(this);
     }
 }

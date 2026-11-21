@@ -34,8 +34,8 @@ import java.util.List;
  */
 public final class FallingAnvilCategory {
     static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("sfm", "falling_anvil");
-    // The host overrides getWidth/getHeight to 80x54 and draws no background, so the page is bare slots.
-    static final int WIDTH = 80;
+    // The host's JEI page is 80 wide with nothing past the output slot, so the card ends where the content does.
+    static final int WIDTH = 66;
     static final int HEIGHT = 54;
 
     static final EmiIngredient ANVILS = EmiIngredient.of(List.of(
