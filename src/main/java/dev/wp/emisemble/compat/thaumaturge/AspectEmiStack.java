@@ -4,6 +4,7 @@ import com.leclowndu93150.thaumaturge.api.aspect.AspectComponents;
 import com.leclowndu93150.thaumaturge.api.aspect.AspectKnowledgeAccess;
 import com.leclowndu93150.thaumaturge.api.aspect.IAspect;
 import com.leclowndu93150.thaumaturge.client.render.aspect.AspectTagRenderer;
+import dev.emi.emi.api.render.EmiTooltipComponents;
 import dev.emi.emi.api.stack.EmiStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -15,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Aspects are neither items nor fluids, so EMI needs a stack type of its own to index and draw them. */
@@ -101,10 +103,13 @@ public final class AspectEmiStack extends EmiStack {
     // Only getTooltip reaches a hovered slot; getTooltipText feeds search and the query tooltip.
     @Override
     public List<ClientTooltipComponent> getTooltip() {
-        List<ClientTooltipComponent> tooltip = super.getTooltip();
-        for (Component line : getTooltipText()) {
+        List<Component> lines = getTooltipText();
+        List<ClientTooltipComponent> tooltip = new ArrayList<>(lines.size() + 2);
+        for (Component line : lines) {
             tooltip.add(ClientTooltipComponent.create(line.getVisualOrderText()));
         }
+        EmiTooltipComponents.appendModName(tooltip, getId().getNamespace());
+        tooltip.addAll(super.getTooltip());
         return tooltip;
     }
 
