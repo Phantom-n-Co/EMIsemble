@@ -1,9 +1,11 @@
 package dev.wp.emisemble;
 
+import dev.wp.emisemble.compat.gateways.GatewaysSync;
 import dev.wp.emisemble.compat.malum.spirit_drops.SpiritDropsData;
 import dev.wp.emisemble.compat.malum.spirit_drops.SpiritDropsSync;
 import dev.wp.emisemble.compat.mythsandlegends.research.ResearchSync;
 import dev.wp.emisemble.config.EmisembleConfig;
+import dev.wp.emisemble.network.GatewaysPayload;
 import dev.wp.emisemble.network.ResearchPayload;
 import dev.wp.emisemble.network.SpiritDropsPayload;
 import dev.wp.emisemble.porting.ClientTicks;
@@ -29,6 +31,7 @@ public final class Emisemble {
         bus.addListener(Emisemble::registerPayloads);
         NeoForge.EVENT_BUS.addListener(SpiritDropsSync::onDatapackSync);
         NeoForge.EVENT_BUS.addListener(ResearchSync::onDatapackSync);
+        NeoForge.EVENT_BUS.addListener(GatewaysSync::onDatapackSync);
         if (FMLEnvironment.dist.isClient()) {
             ClientTicks.install();
         }
@@ -41,6 +44,8 @@ public final class Emisemble {
                 (payload, context) -> SpiritDropsData.accept(payload));
         registrar.playToClient(ResearchPayload.TYPE, ResearchPayload.STREAM_CODEC,
                 (payload, context) -> ResearchSync.accept(payload));
+        registrar.playToClient(GatewaysPayload.TYPE, GatewaysPayload.STREAM_CODEC,
+                (payload, context) -> GatewaysSync.accept(payload));
     }
 
     /**

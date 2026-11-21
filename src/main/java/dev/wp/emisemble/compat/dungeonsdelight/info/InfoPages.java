@@ -11,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.ModList;
 import net.yirmiri.dungeonsdelight.core.registry.DDItems;
 import net.yirmiri.dungeonsdelight.integration.content.twilightforest.TFItems;
 
@@ -38,23 +37,16 @@ public final class InfoPages {
                 DDItems.IRON_CLEAVER.get(), DDItems.DIAMOND_CLEAVER.get(), DDItems.NETHERITE_CLEAVER.get(),
                 DDItems.STAINED_CLEAVER.get()));
         List<Item> knives = new ArrayList<>(List.of(DDItems.STAINED_KNIFE.get()));
-        if (twilightForestLoaded()) {
-            cleavers.addAll(List.of(TFItems.IRONWOOD_CLEAVER.get(), TFItems.KNIGHTMETAL_CLEAVER.get(),
-                    TFItems.STEELEAF_CLEAVER.get(), TFItems.FIERY_CLEAVER.get()));
-            knives.addAll(List.of(TFItems.IRONWOOD_KNIFE.get(), TFItems.KNIGHTMETAL_KNIFE.get(),
-                    TFItems.STEELEAF_KNIFE.get(), TFItems.FIERY_KNIFE.get()));
-        }
+        cleavers.addAll(List.of(TFItems.IRONWOOD_CLEAVER.get(), TFItems.KNIGHTMETAL_CLEAVER.get(),
+                TFItems.STEELEAF_CLEAVER.get(), TFItems.FIERY_CLEAVER.get()));
+        knives.addAll(List.of(TFItems.IRONWOOD_KNIFE.get(), TFItems.KNIGHTMETAL_KNIFE.get(),
+                TFItems.STEELEAF_KNIFE.get(), TFItems.FIERY_KNIFE.get()));
         added += page(registry, "cleaver", "farmersdelight.jei.info.cleaver", cleavers);
         added += page(registry, "knife", "jei.farmersdelight.info.knife", knives);
         added += page(registry, "rancid_reduction", "farmersdelight.jei.info.rancid_reduction",
                 List.of(DDItems.RANCID_REDUCTION.get()));
 
         Emisemble.LOGGER.info("{}: {} info pages registered", NAMESPACE, added);
-    }
-
-    // The host registers its Twilight Forest items either way and only lists them when the mod is present.
-    private static boolean twilightForestLoaded() {
-        return ModList.get().isLoaded("twilightforest");
     }
 
     private static int page(EmiRegistry registry, String name, String translationKey, List<Item> items) {

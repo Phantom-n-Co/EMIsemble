@@ -52,9 +52,9 @@ public final class ConstructionWandCompat {
                 optKey, mode, gui);
     }
 
-    // The host appends the shared installation paragraph to each core's own name, never the core's own description.
+    // The host appends the shared installation paragraph to the core's own description, both from the host's keys.
     private static Component coreText(Item core, Component mode) {
-        return Component.translatable("item.constructionwand." + path(core))
+        return Component.translatable("constructionwand.description." + path(core))
                 .append("\n\n")
                 .append(Component.translatable("constructionwand.description.core", mode));
     }

@@ -7,6 +7,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 logoFile="assets/${mod_id}/logo.png"
 authors="${mod_authors}"
+displayTest="IGNORE_ALL_VERSION"
 description='''
 Native EMI recipe categories for mods that only ship a JEI plugin.
 '''
