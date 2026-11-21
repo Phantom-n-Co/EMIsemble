@@ -21,8 +21,8 @@ final class MalumVisibility {
 
     static void install() {
         try {
-            EmiVisibility.hideStacks(MalumVisibility::hidden);
-            EmiVisibility.hideRecipes(MalumVisibility::hidden);
+            EmiVisibility.hideStacks("malum", MalumVisibility::hidden);
+            EmiVisibility.hideRecipes("malum", MalumVisibility::hidden);
             installing = true;
             try {
                 // The host runs the listener once immediately; the bake for this pass is already under way.
