@@ -369,14 +369,14 @@ def commonSlugs = [
 // CurseForge-only: the project is named differently there, or is not on Modrinth at all.
 def cfSlugs = [
         'animal-pens', 'applied-thaumaturge', 'ars-elemental', 'cognition-mod',
-        'dungeons-delight', 'enigmatic-legacy-plus', 'immersive-engineering',
+        'dungeons-delight', 'eidolon-repraised', 'enigmatic-legacy-plus', 'immersive-engineering',
         'immersive-petroleum', 'lendercataclysm', 'myths-n-legends', 'starbunclemania',
         'thaumaturge',
 ]
 
 // Modrinth-only, same reason in reverse.
 def mrSlugs = [
-        'animalpens', 'cognition', 'dungeons_delight', 'enigmaticlegacy-plus',
+        'animalpens', 'cognition', 'dungeons_delight', 'eidolonrepraised', 'enigmaticlegacy-plus',
         'immersiveengineering', 'immersivepetroleum', 'l_enders-cataclysm', 'myths-and-legends',
 ]
 
