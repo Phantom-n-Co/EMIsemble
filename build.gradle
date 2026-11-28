@@ -198,51 +198,51 @@ dependencies {
         localRuntime "dev.emi:emi-neoforge:${emi_version}"
     }
     if (viewerCompat == 'jei' || viewerCompat == 'both') {
-        localRuntime "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
+        localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
     }
 
-    implementation("software.bernie.geckolib:geckolib-neoforge-1.21.1:4.9.3") { transitive = false }
-    localRuntime("com.github.glitchfiend:TerraBlender-neoforge:1.21.1-4.1.0.8") { transitive = false }
+    implementation("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:4.9.3") { transitive = false }
+    localRuntime("com.github.glitchfiend:TerraBlender-neoforge:${minecraft_version}-4.1.0.8") { transitive = false }
     compileOnly("com.hrznstudio:titanium:1.21-4.0.56") { transitive = false }
     localRuntime("com.hrznstudio:titanium:1.21-4.0.56") { transitive = false }
-    compileOnly("net.blay09.mods:balm-neoforge:21.0.67+1.21.1") { transitive = false }
-    localRuntime("net.blay09.mods:balm-neoforge:21.0.67+1.21.1") { transitive = false }
-    implementation("dev.shadowsoffire:HostileNeuralNetworks:1.21.1-6.5.1") { transitive = false }
+    compileOnly("net.blay09.mods:balm-neoforge:21.0.67+${minecraft_version}") { transitive = false }
+    localRuntime("net.blay09.mods:balm-neoforge:21.0.67+${minecraft_version}") { transitive = false }
+    implementation("dev.shadowsoffire:HostileNeuralNetworks:${minecraft_version}-6.5.1") { transitive = false }
     compileOnly("dev.architectury:architectury-neoforge:13.0.12") { transitive = false }
     localRuntime("dev.architectury:architectury-neoforge:13.0.12") { transitive = false }
-    implementation("com.breakinblocks.animusnv:AnimusNV:1.21.1-5.2.26") { transitive = false }
-    implementation("dev.shadowsoffire:GatewaysToEternity:1.21.1-5.1.0") { transitive = false }
-    compileOnly("com.breakinblocks.neovitae:neovitae:1.21.1-1.1.53") { transitive = false }
-    localRuntime("com.breakinblocks.neovitae:neovitae:1.21.1-1.1.53") { transitive = false }
-    compileOnly("com.klikli_dev:modonomicon-1.21.1-neoforge:1.123.0") { transitive = false }
-    localRuntime("com.klikli_dev:modonomicon-1.21.1-neoforge:1.123.0") { transitive = false }
-    compileOnly("com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1:5.13.5.1445") { transitive = false }
-    localRuntime("com.hollingsworth.ars_nouveau:ars_nouveau-1.21.1:5.13.5.1445") { transitive = false }
+    implementation("com.breakinblocks.animusnv:AnimusNV:${minecraft_version}-5.2.26") { transitive = false }
+    implementation("dev.shadowsoffire:GatewaysToEternity:${minecraft_version}-5.1.0") { transitive = false }
+    compileOnly("com.breakinblocks.neovitae:neovitae:${minecraft_version}-1.1.53") { transitive = false }
+    localRuntime("com.breakinblocks.neovitae:neovitae:${minecraft_version}-1.1.53") { transitive = false }
+    compileOnly("com.klikli_dev:modonomicon-${minecraft_version}-neoforge:1.123.0") { transitive = false }
+    localRuntime("com.klikli_dev:modonomicon-${minecraft_version}-neoforge:1.123.0") { transitive = false }
+    compileOnly("com.hollingsworth.ars_nouveau:ars_nouveau-${minecraft_version}:5.13.5.1445") { transitive = false }
+    localRuntime("com.hollingsworth.ars_nouveau:ars_nouveau-${minecraft_version}:5.13.5.1445") { transitive = false }
     compileOnly("com.teamresourceful.resourcefullib:resourcefullib-neoforge-1.21:3.0.12") { transitive = false }
     localRuntime("com.teamresourceful.resourcefullib:resourcefullib-neoforge-1.21:3.0.12") { transitive = false }
     compileOnly("com.teamresourceful.resourcefulconfig:resourcefulconfig-neoforge-1.21:3.0.11") { transitive = false }
     localRuntime("com.teamresourceful.resourcefulconfig:resourcefulconfig-neoforge-1.21:3.0.11") { transitive = false }
-    implementation("com.alexthw.starbunclemania:starbunclemania-1.21.1:1.5.9.50") { transitive = false }
-    implementation("com.alexthw.ars_elemental:ars_elemental-1.21.1:0.7.10.4.191") { transitive = false }
+    implementation("com.alexthw.starbunclemania:starbunclemania-${minecraft_version}:1.5.9.50") { transitive = false }
+    implementation("com.alexthw.ars_elemental:ars_elemental-${minecraft_version}:0.7.10.4.191") { transitive = false }
     compileOnly("org.appliedenergistics:appliedenergistics2:19.2.19") { transitive = false }
     localRuntime("org.appliedenergistics:appliedenergistics2:19.2.19") { transitive = false }
     localRuntime("org.appliedenergistics:guideme:21.1.22") { transitive = false }
-    implementation("com.sammy.malum:malum:1.21.1-1.8.2.150") { transitive = false }
-    compileOnly("team.lodestar.lodestone:lodestone:1.21.1-1.8.2.523") { transitive = false }
-    localRuntime("team.lodestar.lodestone:lodestone:1.21.1-1.8.2.523") { transitive = false }
+    implementation("com.sammy.malum:malum:${minecraft_version}-1.8.2.150") { transitive = false }
+    compileOnly("team.lodestar.lodestone:lodestone:${minecraft_version}-1.8.2.523") { transitive = false }
+    localRuntime("team.lodestar.lodestone:lodestone:${minecraft_version}-1.8.2.523") { transitive = false }
 
-    implementation("net.favouriteless.enchanted:enchanted-neoforge-1.21.1:4.2.7") { transitive = false }
-    compileOnly("net.favouriteless.stateobserver:stateobserver-neoforge-1.21.1:1.6.4") { transitive = false }
-    localRuntime("net.favouriteless.stateobserver:stateobserver-neoforge-1.21.1:1.6.4") { transitive = false }
-    compileOnly("net.favouriteless.modopedia:modopedia-neoforge-1.21.1:1.1.11") { transitive = false }
-    localRuntime("net.favouriteless.modopedia:modopedia-neoforge-1.21.1:1.1.11") { transitive = false }
+    implementation("net.favouriteless.enchanted:enchanted-neoforge-${minecraft_version}:4.2.7") { transitive = false }
+    compileOnly("net.favouriteless.stateobserver:stateobserver-neoforge-${minecraft_version}:1.6.4") { transitive = false }
+    localRuntime("net.favouriteless.stateobserver:stateobserver-neoforge-${minecraft_version}:1.6.4") { transitive = false }
+    compileOnly("net.favouriteless.modopedia:modopedia-neoforge-${minecraft_version}:1.1.11") { transitive = false }
+    localRuntime("net.favouriteless.modopedia:modopedia-neoforge-${minecraft_version}:1.1.11") { transitive = false }
 
-    implementation("earth.terrarium.chipped:chipped-neoforge-1.21.1:4.0.2") { transitive = false }
-    compileOnly("earth.terrarium.athena:athena-neoforge-1.21.1:4.0.6") { transitive = false }
-    localRuntime("earth.terrarium.athena:athena-neoforge-1.21.1:4.0.6") { transitive = false }
+    implementation("earth.terrarium.chipped:chipped-neoforge-${minecraft_version}:4.0.2") { transitive = false }
+    compileOnly("earth.terrarium.athena:athena-neoforge-${minecraft_version}:4.0.6") { transitive = false }
+    localRuntime("earth.terrarium.athena:athena-neoforge-${minecraft_version}:4.0.6") { transitive = false }
 
     implementation "maven.modrinth:functional-storage:1.21-1.5.7"
-    implementation "maven.modrinth:cooking-for-blockheads:21.1.25+neoforge-1.21.1"
+    implementation "maven.modrinth:cooking-for-blockheads:21.1.25+neoforge-${minecraft_version}"
     implementation "maven.modrinth:animalpens:2.5.2-1.21+NeoForge"
     implementation "maven.modrinth:super-factory-manager:HWz24fIm"
     implementation "maven.modrinth:ars-additions:21.3.0"
@@ -253,12 +253,12 @@ dependencies {
     implementation "maven.modrinth:horseman:1.5.13"
     implementation "maven.modrinth:vanillabackport:mGS7BxD4"
     implementation "maven.modrinth:construction-wand-kots:2.16.13"
-    compileOnly "maven.modrinth:farmers-delight:1.21.1-1.3.4"
-    localRuntime "maven.modrinth:farmers-delight:1.21.1-1.3.4"
+    compileOnly "maven.modrinth:farmers-delight:${minecraft_version}-1.3.4"
+    localRuntime "maven.modrinth:farmers-delight:${minecraft_version}-1.3.4"
     compileOnly "maven.modrinth:runiclib:tk5EQpUG"
     localRuntime "maven.modrinth:runiclib:tk5EQpUG"
-    compileOnly "maven.modrinth:fusion-connected-textures:1.3.16-neoforge-mc1.21.1"
-    localRuntime "maven.modrinth:fusion-connected-textures:1.3.16-neoforge-mc1.21.1"
+    compileOnly "maven.modrinth:fusion-connected-textures:1.3.16-neoforge-mc${minecraft_version}"
+    localRuntime "maven.modrinth:fusion-connected-textures:1.3.16-neoforge-mc${minecraft_version}"
     compileOnly "maven.modrinth:platform:rh4p4ixM"
     localRuntime "maven.modrinth:platform:rh4p4ixM"
     implementation "maven.modrinth:dungeons_delight:1.5.3"
@@ -269,14 +269,14 @@ dependencies {
     localRuntime "maven.modrinth:lionfish-api:3.1"
     compileOnly "maven.modrinth:l_enders-cataclysm:3.33"
     localRuntime "maven.modrinth:l_enders-cataclysm:3.33"
-    implementation "maven.modrinth:embers-re-ignited:1.21.1-1.5.9"
+    implementation "maven.modrinth:embers-re-ignited:${minecraft_version}-1.5.9"
     implementation "maven.modrinth:toxony:pDu34HNo"
     implementation "maven.modrinth:cognition:2.4.13"
     implementation "maven.modrinth:myths-and-legends:1.1.0"
     implementation "maven.modrinth:immersivepetroleum:4.5.0-39"
-    implementation "maven.modrinth:enigmaticlegacy-plus:1.21.1-1.1.2"
+    implementation "maven.modrinth:enigmaticlegacy-plus:${minecraft_version}-1.1.2"
     implementation "maven.modrinth:hexerei:0.5.0.3"
-    implementation "blusunrize.immersiveengineering:ImmersiveEngineering:1.21.1-12.4.2-194"
+    implementation "blusunrize.immersiveengineering:ImmersiveEngineering:${minecraft_version}-12.4.2-194"
 
     implementation "curse.maven:thaumaturge-1628024:9452543"
     implementation "curse.maven:applied-thaumaturge-1718689:9498175"
@@ -284,18 +284,20 @@ dependencies {
     implementation "curse.maven:pagans-blessing-952071:5889348"
     implementation "curse.maven:nutritional-1579319:9456986"
 
-    implementation("dev.shadowsoffire:Apotheosis:1.21.1-8.9.0") { transitive = false }
-    implementation("dev.shadowsoffire:ApothicEnchanting:1.21.1-1.6.4") { transitive = false }
-    implementation("dev.shadowsoffire:ApothicSpawners:1.21.1-1.4.0") { transitive = false }
-    compileOnly("dev.shadowsoffire:Placebo:1.21.1-9.9.4") { transitive = false }
-    localRuntime("dev.shadowsoffire:Placebo:1.21.1-9.9.4") { transitive = false }
-    localRuntime("dev.shadowsoffire:ApothicAttributes:1.21.1-2.11.0") { transitive = false }
+    implementation("dev.shadowsoffire:Apotheosis:${minecraft_version}-8.9.0") { transitive = false }
+    implementation("dev.shadowsoffire:ApothicEnchanting:${minecraft_version}-1.6.4") { transitive = false }
+    implementation("dev.shadowsoffire:ApothicSpawners:${minecraft_version}-1.4.0") { transitive = false }
+    compileOnly("dev.shadowsoffire:Placebo:${minecraft_version}-9.9.4") { transitive = false }
+    localRuntime("dev.shadowsoffire:Placebo:${minecraft_version}-9.9.4") { transitive = false }
+    localRuntime("dev.shadowsoffire:ApothicAttributes:${minecraft_version}-2.11.0") { transitive = false }
 
     localRuntime "maven.modrinth:lithostitched:1.8.1-neoforge-21.1"
-    localRuntime "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1"
+    localRuntime "top.theillusivec4.curios:curios-neoforge:9.5.1+${minecraft_version}"
 
-    localRuntime("vazkii.patchouli:Patchouli:1.21.1-93-NEOFORGE") { transitive = false }
-    localRuntime "com.illusivesoulworks.caelus:caelus-neoforge:7.0.1+1.21.1"
+    localRuntime("vazkii.patchouli:Patchouli:${minecraft_version}-93-NEOFORGE") { transitive = false }
+    localRuntime "com.illusivesoulworks.caelus:caelus-neoforge:7.0.1+${minecraft_version}"
+
+    implementation ("com.alexthw.eidolon_repraised:eidolon_repraised-${minecraft_version}:0.5.0.9.83") {transitive=false}
 
     // Dev only: thaumaturge (+ some other mods?) cause experimental settings screen to show up, don't want that
     localRuntime "maven.modrinth:yeetus-experimentus:87.0.0"
