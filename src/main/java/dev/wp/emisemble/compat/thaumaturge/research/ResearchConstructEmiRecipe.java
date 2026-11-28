@@ -168,7 +168,7 @@ public final class ResearchConstructEmiRecipe extends BasicEmiRecipe {
         for (int i = 0; i < cost.size(); i++) {
             AspectInstance aspect = cost.get(i);
             widgets.addSlot(new AspectEmiStack(aspect.aspect(), aspect.amount()), costX + i * ASPECT_STEP, ASPECT_Y)
-                    .drawBack(false);
+                    .drawBack(false).recipeContext(this);
         }
 
         boolean gated = !passesGate();

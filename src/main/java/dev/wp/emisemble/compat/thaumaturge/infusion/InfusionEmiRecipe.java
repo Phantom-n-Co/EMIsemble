@@ -121,8 +121,9 @@ public final class InfusionEmiRecipe<R extends Recipe<?> & IInfusionRecipe> exte
         int centre = aspects.size() * ASPECT_STEP / 2;
         for (int i = 0; i < aspects.size(); i++) {
             AspectInstance aspect = aspects.get(i);
+            // Bound to the page so a favourited cost keeps its amount: EMI only forces counts on recipe-bound favourites.
             RecipeSlots.add(widgets, new AspectEmiStack(aspect.aspect(), aspect.amount()),
-                    ASPECT_CENTRE_X - centre + i * ASPECT_STEP, ASPECT_Y);
+                    ASPECT_CENTRE_X - centre + i * ASPECT_STEP, ASPECT_Y).recipeContext(this);
         }
 
         int level = Math.min(INSTABILITY_LEVEL_CAP, recipe.instability() / 2);

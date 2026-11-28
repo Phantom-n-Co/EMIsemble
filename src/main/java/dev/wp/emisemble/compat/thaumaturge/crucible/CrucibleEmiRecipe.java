@@ -65,7 +65,7 @@ public final class CrucibleEmiRecipe extends BasicEmiRecipe {
         for (int i = 0; i < aspects.size(); i++) {
             AspectInstance aspect = aspects.get(i);
             RecipeSlots.add(widgets, new AspectEmiStack(aspect.aspect(), aspect.amount()),
-                    ASPECT_CENTRE_X - centre + i * ASPECT_STEP, ASPECT_Y);
+                    ASPECT_CENTRE_X - centre + i * ASPECT_STEP, ASPECT_Y).recipeContext(this);
         }
 
         if (!recipe.doesPassGate(Minecraft.getInstance().player)) {
